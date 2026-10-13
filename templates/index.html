@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sense — Student Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="welcome-page">
+
+  <!-- Nav -->
+  <nav class="welcome-nav">
+    <div class="welcome-logo-box">💬</div>
+    <div class="welcome-logo-text">
+      <h2>Sense</h2>
+      <span>Student Portal</span>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="welcome-hero">
+    <div class="welcome-text">
+      <h1>
+        Every feedback<br>matters.<br>
+        <span class="accent">Every voice helps<br>shape better<br>education.</span>
+      </h1>
+      <p>Development of a Sentiment Faculty Evaluation Analysis System for a Student Portal</p>
+
+      <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+        <a href="/dashboard" class="btn-enter">
+          Enter dashboard <span class="arrow">→</span>
+        </a>
+        <span class="btn-enter-caption">Safe, anonymous, and constructive</span>
+      </div>
+    </div>
+
+    <!-- Illustration -->
+    <div class="welcome-illustration">
+      <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- person silhouette -->
+        <ellipse cx="140" cy="185" rx="70" ry="50" fill="rgba(200,190,240,0.35)"/>
+        <circle cx="140" cy="110" r="42" fill="rgba(200,190,240,0.45)"/>
+        <!-- arrows -->
+        <line x1="200" y1="70" x2="200" y2="30" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="200" y1="30" x2="190" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="200" y1="30" x2="210" y2="44" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="220" y1="55" x2="220" y2="95" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="220" y1="95" x2="210" y2="81" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="220" y1="95" x2="230" y2="81" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

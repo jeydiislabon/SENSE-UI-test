@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ member.name }} — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Workspace</div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-item">
+        <span class="nav-icon">⊞</span> <span>Dashboard</span>
+      </a>
+      <a href="/advisors" class="nav-item active">
+        <span class="nav-icon">👥</span> <span>Advisors</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty or feedback" id="globalSearch" />
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <a href="/advisors" class="back-link">← Back to advisors</a>
+
+      <!-- Profile Card -->
+      <div class="faculty-profile-card">
+        <div class="faculty-profile-banner"></div>
+        <div class="faculty-profile-info">
+          <div class="faculty-profile-avatar" style="background: {{ member.color }}">
+            {{ member.initials }}
+          </div>
+          <div class="faculty-profile-details">
+            <div class="faculty-profile-name">{{ member.name }}</div>
+            <div class="faculty-profile-role">{{ member.role }}</div>
+            <div class="faculty-profile-meta">
+              <span>✉ {{ member.email }}</span>
+              <span>📍 {{ member.location }}</span>
+            </div>
+          </div>
+          {% if member.accepting %}
+          <div class="accepting-badge">Accepting feedback</div>
+          {% else %}
+          <div class="closed-badge">Closed</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Page grid -->
+      <div class="faculty-page-grid">
+
+        <!-- LEFT column -->
+        <div class="faculty-left">
+
+          <!-- Sentiment Overview -->
+          <div class="card">
+            <div class="sentiment-header">
+              <div class="sentiment-title">📈 Sentiment overview</div>
+              <div class="sentiment-count">Based on {{ member.comments | length }} comments</div>
+            </div>
+
+            <div class="sentiment-stats">
+              <div class="sentiment-stat">
+                <span class="sentiment-label">
+                  <span class="sentiment-dot" style="background:var(--positive)"></span>Positive
+                </span>
+                <span class="sentiment-pct positive">{{ member.sentiment.positive }}%</span>
+              </div>
+              <div class="sentiment-stat">
+                <span class="sentiment-label">
+                  <span class="sentiment-dot" style="background:var(--neutral)"></span>Neutral
+                </span>
+                <span class="sentiment-pct neutral">{{ member.sentiment.neutral }}%</span>
+              </div>
+              <div class="sentiment-stat">
+                <span class="sentiment-label">
+                  <span class="sentiment-dot" style="background:var(--negative)"></span>Negative
+                </span>
+                <span class="sentiment-pct negative">{{ member.sentiment.negative }}%</span>
+              </div>
+            </div>
+
+            <!-- Bar -->
+            <div class="sentiment-bar">
+              <div class="sentiment-bar-fill positive" style="width:{{ member.sentiment.positive }}%"></div>
+              <div class="sentiment-bar-fill neutral"  style="width:{{ member.sentiment.neutral }}%"></div>
+              <div class="sentiment-bar-fill negative" style="width:{{ member.sentiment.negative }}%"></div>
+            </div>
+          </div>
+
+          <!-- Comment Summary -->
+          <div class="card">
+            <div class="summary-label">💬 Comment Summary</div>
+            <p class="summary-text">{{ member.summary }}</p>
+            <div class="summary-note">
+              This summary is generated from constructive student feedback. Noise entries are excluded.
+            </div>
+          </div>
+
+        </div><!-- end left -->
+
+        <!-- RIGHT column -->
+        <div class="faculty-right">
+
+          <!-- Pie Chart -->
+          <div class="card" style="text-align:center;">
+            <div class="card-title" style="margin-bottom:14px;">Sentiment Distribution</div>
+            <div class="chart-wrap">
+              <canvas id="sentimentChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Feedback Form -->
+          <div class="card">
+            <div class="feedback-form-title">Share your feedback</div>
+            <p class="feedback-form-sub">Your response is anonymous. Please keep it specific and constructive.</p>
+            <textarea class="feedback-textarea" id="feedbackText"
+              placeholder="What would you like to share about {{ member.name }}?"></textarea>
+            <p class="feedback-note">Sentiment is analyzed automatically</p>
+            <button class="btn-submit" id="submitBtn"
+              {% if not member.accepting %}disabled{% endif %}>
+              {% if member.accepting %}Submit feedback{% else %}Feedback closed{% endif %}
+            </button>
+            <div class="feedback-result" id="feedbackResult"></div>
+          </div>
+
+          <!-- Recent Feedback -->
+          <div class="card">
+            <div class="card-title">Recent Feedback</div>
+            <div style="margin-top:12px;">
+              {% for c in member.comments %}
+              <div class="recent-feedback-item">
+                <div class="recent-feedback-header">
+                  <span class="recent-feedback-anon">Anonymous student</span>
+                  <span class="badge {{ c.label | lower }}">{{ c.label }}</span>
+                </div>
+                <div class="recent-feedback-text">{{ c.text }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div><!-- end right -->
+      </div><!-- end grid -->
+    </div><!-- end page-body -->
+  </div><!-- end main-content -->
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+  // ---- Sentiment Donut Chart ----
+  const ctx = document.getElementById('sentimentChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Positive', 'Neutral', 'Negative'],
+      datasets: [{
+        data: [
+          {{ member.sentiment.positive }},
+          {{ member.sentiment.neutral }},
+          {{ member.sentiment.negative }}
+        ],
+        backgroundColor: ['#00B894', '#FDCB6E', '#E17055'],
+        borderWidth: 0,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 12 }, padding: 14, usePointStyle: true, pointStyleWidth: 8 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
+          }
+        }
+      }
+    }
+  });
+
+  // ---- Feedback Submit ----
+  const facultyId = {{ member.id }};
+  document.getElementById('submitBtn').addEventListener('click', async function() {
+    const text = document.getElementById('feedbackText').value.trim();
+    if (!text) { alert('Please enter your feedback first.'); return; }
+
+    this.disabled = true;
+    this.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(`/submit_feedback/${facultyId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+
+      const result = document.getElementById('feedbackResult');
+      result.className = 'feedback-result show ' + data.label.toLowerCase();
+      result.textContent = `✓ ${data.message} Sentiment detected: ${data.label}`;
+
+      document.getElementById('feedbackText').value = '';
+    } catch(e) {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      this.disabled = false;
+      this.textContent = 'Submit feedback';
+    }
+  });
+
+  // Global search
+  document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/advisors?q=' + encodeURIComponent(this.value.trim());
+    }
+  });
+</script>
+</body>
+</html>

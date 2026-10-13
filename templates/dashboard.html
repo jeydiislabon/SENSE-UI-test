@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Workspace</div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-item active">
+        <span class="nav-icon">⊞</span> <span>Dashboard</span>
+      </a>
+      <a href="/advisors" class="nav-item">
+        <span class="nav-icon">👥</span> <span>Advisors</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty or feedback" id="globalSearch" />
+      </div>
+    </header>
+
+    <div class="page-body">
+      <p class="page-label">Dashboard</p>
+      <h1 class="page-title">Overview</h1>
+      <p class="page-subtitle">Here's what's happening across the departments.</p>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon purple">💬</div>
+          <div class="stat-number">{{ stats.total_feedback }}</div>
+          <div class="stat-label">Total feedback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">👥</div>
+          <div class="stat-number">{{ stats.total_advisors }}</div>
+          <div class="stat-label">Advisors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">🔒</div>
+          <div class="stat-number">{{ stats.noise_filtered }}</div>
+          <div class="stat-label">Noise filtered</div>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="dashboard-grid">
+
+        <!-- Latest Comments -->
+        <div class="card">
+          <div class="card-title">Latest comments</div>
+          <div class="card-subtitle">Recently submitted student feedback</div>
+
+          {% for c in latest_comments %}
+          <div class="comment-item">
+            <div class="avatar" style="background: {{ c.color }}">{{ c.initials }}</div>
+            <div class="comment-meta">
+              <div class="comment-name">
+                {{ c.name }}
+                <span class="badge {{ c.label | lower }}">{{ c.label }}</span>
+              </div>
+              <div class="comment-text">{{ c.text }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Noise Audit Log -->
+        <div class="card">
+          <div class="noise-header">
+            <div class="noise-icon">🔒</div>
+            <div>
+              <div class="card-title">Noise audit log</div>
+              <div class="card-subtitle" style="margin-bottom:0">Automatically filtered responses</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            {% for n in noise_log %}
+            <div class="noise-item">
+              <div class="noise-dash">—</div>
+              <div>
+                <div class="noise-text">{{ n.text }}</div>
+                <div class="noise-reason">{{ n.reason }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div><!-- end grid -->
+    </div><!-- end page-body -->
+  </div><!-- end main-content -->
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+  // Global search: redirect to advisors with query
+  document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/advisors?q=' + encodeURIComponent(this.value.trim());
+    }
+  });
+</script>
+</body>
+</html>

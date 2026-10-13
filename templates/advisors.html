@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advisors — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Workspace</div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-item">
+        <span class="nav-icon">⊞</span> <span>Dashboard</span>
+      </a>
+      <a href="/advisors" class="nav-item active">
+        <span class="nav-icon">👥</span> <span>Advisors</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty or feedback" id="globalSearch" value="{{ query }}" />
+      </div>
+    </header>
+
+    <div class="page-body">
+      <p class="page-label">Directory</p>
+      <h1 style="font-size:28px; font-weight:800; margin-bottom:24px;">Advisors</h1>
+
+      <!-- Search by name -->
+      <div class="advisors-search-row">
+        <form method="GET" action="/advisors">
+          <div class="advisors-search">
+            <span style="color:var(--text-muted)">🔍</span>
+            <input type="text" name="q" placeholder="Search by name" value="{{ query }}" autocomplete="off" />
+          </div>
+        </form>
+      </div>
+
+      <!-- Faculty Grid -->
+      {% if faculty %}
+      <div class="faculty-grid">
+        {% for f in faculty %}
+        <a href="/faculty/{{ f.id }}" class="faculty-card">
+          <div class="faculty-card-top">
+            <div class="avatar" style="background: {{ f.color }}">{{ f.initials }}</div>
+            <div class="btn-arrow">›</div>
+          </div>
+          <div class="faculty-name">{{ f.name }}</div>
+          <div class="faculty-role">{{ f.role }}</div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align:center; padding:60px 0; color:var(--text-muted);">
+        <div style="font-size:40px; margin-bottom:12px;">🔍</div>
+        <p>No advisors found for "<strong>{{ query }}</strong>"</p>
+        <a href="/advisors" style="color:var(--purple); margin-top:8px; display:inline-block;">Clear search</a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/advisors?q=' + encodeURIComponent(this.value.trim());
+    }
+  });
+</script>
+</body>
+</html>
