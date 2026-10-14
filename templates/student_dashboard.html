@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Student</div>
+    <nav class="sidebar-nav">
+      <a href="/student/dashboard" class="nav-item active">
+        <span class="nav-icon">⊞</span> <span>My Evaluations</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty..." id="searchInput" />
+      </div>
+    </header>
+
+    <div class="page-body">
+      <p class="page-label">This Semester</p>
+      <h1 class="page-title">Faculty Evaluations</h1>
+      <p class="page-subtitle">Select a faculty member to submit your evaluation. All responses are anonymous.</p>
+
+      <div class="faculty-grid" id="facultyGrid">
+        {% for f in faculty %}
+        <a href="/student/evaluate/{{ f.id }}" class="faculty-card">
+          <div class="faculty-card-top">
+            <div class="avatar" style="background: {{ f.color }}; color: {{ '#1A1A1A' if f.color == '#FFD100' else '#fff' }}">
+              {{ f.initials }}
+            </div>
+            <div class="btn-arrow">›</div>
+          </div>
+          <div class="faculty-name">{{ f.name }}</div>
+          <div class="faculty-role">{{ f.role }}</div>
+          <hr class="faculty-divider" />
+          <span class="subject-tag">{{ f.subject }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.faculty-card').forEach(card => {
+      const name = card.querySelector('.faculty-name').textContent.toLowerCase();
+      card.style.display = name.includes(q) ? '' : 'none';
+    });
+  });
+</script>
+</body>
+</html>

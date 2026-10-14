@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .obj-section {
+      margin-bottom: 32px;
+    }
+
+    .obj-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .obj-badge {
+      background: #1A1A1A;
+      color: #FFD100;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .obj-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #1A1A1A;
+    }
+
+    .obj-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Noise table */
+    .noise-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .noise-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #1A1A1A;
+      color: #FFD100;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .noise-table th:first-child { border-radius: 8px 0 0 8px; }
+    .noise-table th:last-child  { border-radius: 0 8px 8px 0; }
+
+    .noise-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .noise-table tr:last-child td { border-bottom: none; }
+    .noise-table tr:hover td { background: #F9F9F9; }
+
+    .noise-text-cell {
+      font-family: monospace;
+      font-size: 13px;
+      color: #C0392B;
+      background: #FFF5F5;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .noise-type-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .noise-type-badge.tagalog  { background: #FFF3CD; color: #7A5C00; }
+    .noise-type-badge.gibberish { background: #FFE8E3; color: #922B21; }
+    .noise-type-badge.too_short { background: #E8F4FD; color: #1A5276; }
+
+    /* Noise summary cards */
+    .noise-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .noise-summary-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid #FFD100;
+    }
+
+    .noise-summary-card.tagalog  { border-left-color: #F39C12; }
+    .noise-summary-card.gibberish { border-left-color: #E74C3C; }
+    .noise-summary-card.total    { border-left-color: #FFD100; }
+
+    .noise-summary-num   { font-size: 32px; font-weight: 900; color: #1A1A1A; }
+    .noise-summary-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter-tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .filter-tab.active { background: #1A1A1A; color: #FFD100; border-color: #1A1A1A; }
+    .filter-tab:hover  { border-color: #1A1A1A; }
+
+    /* Chart placeholders */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .coming-soon {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .coming-soon-icon  { font-size: 36px; margin-bottom: 12px; }
+    .coming-soon-title { font-size: 15px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+    .coming-soon-text  { font-size: 13px; line-height: 1.5; }
+    .coming-soon-badge {
+      display: inline-block;
+      margin-top: 12px;
+      background: #F2F2F2;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Workspace</div>
+    <nav class="sidebar-nav">
+      <a href="/admin/dashboard" class="nav-item active">
+        <span class="nav-icon">⊞</span> <span>Dashboard</span>
+      </a>
+      <a href="/admin/advisors" class="nav-item">
+        <span class="nav-icon">👥</span> <span>Advisors</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty or feedback" id="globalSearch" />
+      </div>
+    </header>
+
+    <div class="page-body">
+      <p class="page-label">Admin Dashboard</p>
+      <h1 class="page-title">Overview</h1>
+      <p class="page-subtitle">Evaluation analytics and NLP pipeline results across all faculty.</p>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon purple">💬</div>
+          <div class="stat-number">{{ stats.total_feedback }}</div>
+          <div class="stat-label">Total Feedback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">👥</div>
+          <div class="stat-number">{{ stats.total_advisors }}</div>
+          <div class="stat-label">Advisors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">🚫</div>
+          <div class="stat-number">{{ stats.noise_filtered }}</div>
+          <div class="stat-label">Noise Filtered</div>
+        </div>
+      </div>
+
+      <!-- OBJ 1.1 — Noise Filtration Report -->
+      <div class="obj-section">
+        <div class="obj-header">
+          <span class="obj-badge">Obj 1.1</span>
+          <div>
+            <div class="obj-title">Noise Filtration Report</div>
+            <div class="obj-desc">Invalid comments automatically detected and removed before analysis</div>
+          </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="noise-summary">
+          <div class="noise-summary-card total">
+            <div class="noise-summary-num">{{ noise_log | length }}</div>
+            <div class="noise-summary-label">Total Filtered</div>
+          </div>
+          <div class="noise-summary-card tagalog">
+            <div class="noise-summary-num">{{ tagalog_count }}</div>
+            <div class="noise-summary-label">Tagalog / Non-English</div>
+          </div>
+          <div class="noise-summary-card gibberish">
+            <div class="noise-summary-num">{{ gibberish_count }}</div>
+            <div class="noise-summary-label">Gibberish / Invalid</div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterNoise('all', this)">All</button>
+          <button class="filter-tab" onclick="filterNoise('tagalog', this)">🇵🇭 Tagalog</button>
+          <button class="filter-tab" onclick="filterNoise('gibberish', this)">🚫 Gibberish</button>
+        </div>
+
+        <!-- Noise table -->
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="noise-table" id="noiseTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Faculty</th>
+                <th>Submitted Text</th>
+                <th>Reason Filtered</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for n in noise_log %}
+              <tr data-type="{{ n.type }}">
+                <td style="color:var(--text-muted); width:40px;">{{ loop.index }}</td>
+                <td style="font-weight:600;">{{ n.faculty }}</td>
+                <td><span class="noise-text-cell">"{{ n.text }}"</span></td>
+                <td style="color:var(--text-muted);">{{ n.reason }}</td>
+                <td>
+                  <span class="noise-type-badge {{ n.type }}">
+                    {% if n.type == 'tagalog' %}🇵🇭 Tagalog
+                    {% elif n.type == 'gibberish' %}🚫 Gibberish
+                    {% else %}⚠ Invalid{% endif %}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OBJ 1.2 — Sentiment Analytics -->
+      <div class="obj-section">
+        <div class="obj-header">
+          <span class="obj-badge">Obj 1.2</span>
+          <div>
+            <div class="obj-title">Sentiment Analytics</div>
+            <div class="obj-desc">Positive, Neutral, and Negative classification per faculty</div>
+          </div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="coming-soon">
+            <div class="coming-soon-icon">📊</div>
+            <div class="coming-soon-title">Sentiment Charts</div>
+            <div class="coming-soon-text">
+              RoBERTa sentiment classification results will appear here after the NLP pipeline is integrated.
+            </div>
+            <span class="coming-soon-badge">Pending NLP Integration</span>
+          </div>
+          <div class="coming-soon">
+            <div class="coming-soon-icon">📈</div>
+            <div class="coming-soon-title">Sentiment Trends</div>
+            <div class="coming-soon-text">
+              Faculty-by-faculty breakdown of positive, neutral, and negative feedback over time.
+            </div>
+            <span class="coming-soon-badge">Pending NLP Integration</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBJ 1.3 — Feedback Summarization -->
+      <div class="obj-section">
+        <div class="obj-header">
+          <span class="obj-badge">Obj 1.3</span>
+          <div>
+            <div class="obj-title">Feedback Summarization</div>
+            <div class="obj-desc">AI-generated summaries of recurring valid feedback per faculty</div>
+          </div>
+        </div>
+
+        <div class="coming-soon">
+          <div class="coming-soon-icon">🤖</div>
+          <div class="coming-soon-title">BART Summarization Engine</div>
+          <div class="coming-soon-text">
+            Concise AI-generated summaries of student feedback will appear here once the BART model is connected.
+            Only valid, English-language feedback that passed noise filtration will be included.
+          </div>
+          <span class="coming-soon-badge">Pending NLP Integration</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterNoise(type, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('#noiseTable tbody tr').forEach(row => {
+      if (type === 'all' || row.dataset.type === type) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/admin/advisors?q=' + encodeURIComponent(this.value.trim());
+    }
+  });
+</script>
+</body>
+</html>

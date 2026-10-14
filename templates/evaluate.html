@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluate {{ member.name }} — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    .eval-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Star rating */
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0 24px;
+    }
+
+    .star {
+      font-size: 36px;
+      cursor: pointer;
+      color: #D0D0D0;
+      transition: color 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .star:hover, .star.active { color: #FFD100; transform: scale(1.1); }
+
+    .rating-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      min-height: 20px;
+      font-weight: 500;
+    }
+
+    /* Language warning */
+    .lang-warning {
+      display: none;
+      background: #FFF3CD;
+      border: 1.5px solid #FFD100;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #7A5C00;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .lang-warning.show { display: flex; gap: 10px; align-items: flex-start; }
+    .lang-warning-icon { font-size: 18px; flex-shrink: 0; }
+
+    .noise-warning {
+      display: none;
+      background: #FFE8E3;
+      border: 1.5px solid #E74C3C;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #922B21;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .noise-warning.show { display: flex; gap: 10px; align-items: flex-start; }
+
+    /* Char counter */
+    .char-counter {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Thank you screen */
+    .thankyou-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .thankyou-screen.show { display: block; }
+    .thankyou-icon { font-size: 64px; margin-bottom: 20px; }
+    .thankyou-title { font-size: 26px; font-weight: 900; color: #1A1A1A; margin-bottom: 12px; }
+    .thankyou-text  { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+    .eval-form-card { background: var(--card-bg); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
+
+    .english-note {
+      background: #F2F2F2;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">💬</div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Student</div>
+    <nav class="sidebar-nav">
+      <a href="/student/dashboard" class="nav-item active">
+        <span class="nav-icon">⊞</span> <span>My Evaluations</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your voice matters</h4>
+        <p>Feedback stays anonymous and helps our faculty improve.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search faculty..." />
+      </div>
+    </header>
+
+    <div class="page-body">
+      <a href="/student/dashboard" class="back-link">← Back to evaluations</a>
+
+      <!-- Faculty profile strip -->
+      <div class="faculty-profile-card" style="margin-bottom:24px;">
+        <div class="faculty-profile-banner"></div>
+        <div class="faculty-profile-info">
+          <div class="faculty-profile-avatar" style="background: {{ member.color }}; color: {{ '#1A1A1A' if member.color == '#FFD100' else '#fff' }}">
+            {{ member.initials }}
+          </div>
+          <div class="faculty-profile-details">
+            <div class="faculty-profile-name">{{ member.name }}</div>
+            <div class="faculty-profile-role">{{ member.role }}</div>
+            <div class="faculty-profile-meta">
+              <span>📚 {{ member.subject }}</span>
+              <span>📍 {{ member.location }}</span>
+            </div>
+          </div>
+          {% if member.accepting %}
+          <div class="accepting-badge">Accepting feedback</div>
+          {% else %}
+          <div class="closed-badge">Closed</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="eval-wrap">
+
+        <!-- Thank you screen (hidden until submit) -->
+        <div class="thankyou-screen card" id="thankyouScreen">
+          <div class="thankyou-icon">✅</div>
+          <div class="thankyou-title">Thank you for your feedback!</div>
+          <div class="thankyou-text">
+            Your evaluation for <strong>{{ member.name }}</strong> has been submitted successfully
+            for this semester. Your response is anonymous and will be used to help improve
+            the quality of education at TIP.
+          </div>
+          <a href="/student/dashboard" class="btn-submit" style="display:inline-block; width:auto; padding: 12px 32px; text-decoration:none;">
+            Back to Evaluations
+          </a>
+        </div>
+
+        <!-- Evaluation form -->
+        <div id="evalForm">
+          <div class="eval-form-card">
+            <h2 style="font-size:18px; font-weight:800; margin-bottom:4px;">Faculty Evaluation</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">
+              Your response is anonymous. Please be specific and constructive.
+            </p>
+
+            <!-- Star rating -->
+            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Overall Rating</div>
+            <div class="star-rating" id="starRating">
+              <span class="star" data-val="1">★</span>
+              <span class="star" data-val="2">★</span>
+              <span class="star" data-val="3">★</span>
+              <span class="star" data-val="4">★</span>
+              <span class="star" data-val="5">★</span>
+            </div>
+            <div class="rating-label" id="ratingLabel">Click a star to rate</div>
+
+            <!-- English note -->
+            <div class="english-note">
+              🇺🇸 <span>Please write your feedback in <strong>English only</strong>. Tagalog responses will not be processed by the system.</span>
+            </div>
+
+            <!-- Warnings -->
+            <div class="lang-warning" id="langWarning">
+              <span class="lang-warning-icon">⚠️</span>
+              <span id="langWarningText">Tagalog detected. Please rewrite your feedback in English.</span>
+            </div>
+            <div class="noise-warning" id="noiseWarning">
+              <span class="lang-warning-icon">🚫</span>
+              <span id="noiseWarningText">Invalid response detected. Please write a meaningful evaluation in English.</span>
+            </div>
+
+            <!-- Feedback textarea -->
+            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Written Feedback</div>
+            <textarea
+              class="feedback-textarea"
+              id="feedbackText"
+              placeholder="What would you like to share about {{ member.name }}? (English only)"
+              maxlength="500"
+              oninput="onTextInput()"
+              {% if not member.accepting %}disabled{% endif %}
+            ></textarea>
+            <div class="char-counter"><span id="charCount">0</span>/500</div>
+            <p class="feedback-note" style="margin-top:8px;">Sentiment is analyzed automatically. Your identity will not be stored.</p>
+
+            <button class="btn-submit" id="submitBtn"
+              style="margin-top:16px;"
+              {% if not member.accepting %}disabled{% endif %}>
+              {% if member.accepting %}Submit Evaluation{% else %}Evaluation Closed{% endif %}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const facultyId = {{ member.id }};
+  let selectedRating = 0;
+  let noiseCheckTimeout = null;
+
+  const RATING_LABELS = {
+    1: "1 — Poor",
+    2: "2 — Below Average",
+    3: "3 — Average",
+    4: "4 — Good",
+    5: "5 — Excellent"
+  };
+
+  // Star rating
+  document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('click', () => {
+      selectedRating = parseInt(star.dataset.val);
+      document.querySelectorAll('.star').forEach((s, i) => {
+        s.classList.toggle('active', i < selectedRating);
+      });
+      document.getElementById('ratingLabel').textContent = RATING_LABELS[selectedRating];
+    });
+  });
+
+  // Char counter + live noise check
+  function onTextInput() {
+    const text = document.getElementById('feedbackText').value;
+    document.getElementById('charCount').textContent = text.length;
+
+    // Hide warnings while typing
+    document.getElementById('langWarning').classList.remove('show');
+    document.getElementById('noiseWarning').classList.remove('show');
+
+    // Debounced live check
+    clearTimeout(noiseCheckTimeout);
+    if (text.trim().length > 8) {
+      noiseCheckTimeout = setTimeout(() => liveNoiseCheck(text), 800);
+    }
+  }
+
+  async function liveNoiseCheck(text) {
+    try {
+      const res = await fetch('/api/check_noise', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      if (data.is_noise) {
+        if (data.type === 'tagalog') {
+          document.getElementById('langWarningText').textContent =
+            'Tagalog detected in your response. Please rewrite in English only.';
+          document.getElementById('langWarning').classList.add('show');
+        } else {
+          document.getElementById('noiseWarningText').textContent =
+            'This response may be flagged as invalid. Please write a meaningful evaluation.';
+          document.getElementById('noiseWarning').classList.add('show');
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Submit
+  document.getElementById('submitBtn').addEventListener('click', async function() {
+    const text = document.getElementById('feedbackText').value.trim();
+
+    if (selectedRating === 0) {
+      alert('Please select a star rating first.');
+      return;
+    }
+    if (!text) {
+      alert('Please write your feedback before submitting.');
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(`/student/submit/${facultyId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, rating: selectedRating })
+      });
+      const data = await res.json();
+
+      if (data.status === 'noise') {
+        // Show appropriate warning but don't block
+        if (data.type === 'tagalog') {
+          document.getElementById('langWarningText').textContent = data.message;
+          document.getElementById('langWarning').classList.add('show');
+        } else {
+          document.getElementById('noiseWarningText').textContent = data.message;
+          document.getElementById('noiseWarning').classList.add('show');
+        }
+        this.disabled = false;
+        this.textContent = 'Submit Evaluation';
+
+      } else if (data.status === 'success') {
+        // Show thank you screen
+        document.getElementById('evalForm').style.display = 'none';
+        document.getElementById('thankyouScreen').classList.add('show');
+      }
+
+    } catch(e) {
+      alert('Something went wrong. Please try again.');
+      this.disabled = false;
+      this.textContent = 'Submit Evaluation';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,35 +1,38 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from functools import wraps
+import re
 
 app = Flask(__name__)
 app.secret_key = "sense-secret-key-change-in-production"
 
 # ---------------------------------------------------------------------------
-# MOCK ADMIN CREDENTIALS — replace with DB lookup after Jamie's backend merges
+# FIXED CREDENTIALS — replace with DB lookup after Jamie's backend merges
 # ---------------------------------------------------------------------------
-ADMIN_CREDENTIALS = {
-    "admin": "sense2024",
+USERS = {
+    "student":  {"password": "student123", "role": "student"},
+    "admin":    {"password": "admin123",   "role": "admin"},
+    "faculty":  {"password": "faculty123", "role": "admin"},
 }
 
 # ---------------------------------------------------------------------------
 # AUTH HELPERS
 # ---------------------------------------------------------------------------
 
-def login_required(f):
-    """Decorator — redirects to login if not authenticated.
-    NOTE: temporarily disabled for development. Re-enable by uncommenting the check below.
-    """
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        # if not session.get("logged_in"):
-        #     return redirect(url_for("login", next=request.path))
-        return f(*args, **kwargs)
-    return decorated
+def login_required(role=None):
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if not session.get("logged_in"):
+                return redirect(url_for("login"))
+            if role and session.get("role") != role:
+                return redirect(url_for("login"))
+            return f(*args, **kwargs)
+        return decorated
+    return decorator
 
 # ---------------------------------------------------------------------------
-# MOCK DATA — replace with real NLP pipeline results later
+# MOCK FACULTY DATA
 # ---------------------------------------------------------------------------
-
 FACULTY = [
     {
         "id": 1,
@@ -39,6 +42,7 @@ FACULTY = [
         "email": "acruz@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Embedded Systems",
         "accepting": True,
         "sentiment": {"positive": 65, "neutral": 20, "negative": 15},
         "summary": (
@@ -61,6 +65,7 @@ FACULTY = [
         "email": "mlim@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Computer Networks 2",
         "accepting": True,
         "sentiment": {"positive": 58, "neutral": 28, "negative": 14},
         "summary": (
@@ -83,6 +88,7 @@ FACULTY = [
         "email": "rsantos@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Data Structures & Algorithms",
         "accepting": True,
         "sentiment": {"positive": 72, "neutral": 18, "negative": 10},
         "summary": (
@@ -104,6 +110,7 @@ FACULTY = [
         "email": "jdelarosa@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Microprocessors & Microcontrollers",
         "accepting": True,
         "sentiment": {"positive": 60, "neutral": 25, "negative": 15},
         "summary": (
@@ -125,6 +132,7 @@ FACULTY = [
         "email": "ctorres@tip.edu.ph",
         "location": "CpE Department",
         "color": "#FFD100",
+        "subject": "Digital Signal Processing",
         "accepting": True,
         "sentiment": {"positive": 70, "neutral": 20, "negative": 10},
         "summary": (
@@ -146,6 +154,7 @@ FACULTY = [
         "email": "bvillanueva@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Engineering Mathematics",
         "accepting": True,
         "sentiment": {"positive": 55, "neutral": 30, "negative": 15},
         "summary": (
@@ -167,6 +176,7 @@ FACULTY = [
         "email": "agomez@tip.edu.ph",
         "location": "CpE Department",
         "color": "#1A1A1A",
+        "subject": "Logic Circuits & Design",
         "accepting": True,
         "sentiment": {"positive": 62, "neutral": 22, "negative": 16},
         "summary": (
@@ -188,6 +198,7 @@ FACULTY = [
         "email": "ereyes@tip.edu.ph",
         "location": "CpE Department",
         "color": "#FFD100",
+        "subject": "Computer Architecture",
         "accepting": True,
         "sentiment": {"positive": 68, "neutral": 22, "negative": 10},
         "summary": (
@@ -203,15 +214,20 @@ FACULTY = [
     },
 ]
 
+# ---------------------------------------------------------------------------
+# MOCK NOISE LOG (Obj 1.1) — grows as students submit filtered feedback
+# ---------------------------------------------------------------------------
 NOISE_LOG = [
-    {"text": '"grr"',         "reason": "Numbers only"},
-    {"text": '"asdasdasd"',   "reason": "Random characters"},
-    {"text": '"DINOROBONG"',  "reason": "Keyboard pattern"},
-    {"text": '"67"',          "reason": "Numbers only"},
-    {"text": '"........."',   "reason": "Punctuation only"},
-    {"text": '"lkjhgfdsa"',   "reason": "Keyboard pattern"},
-    {"text": '"123456"',      "reason": "Numbers only"},
-    {"text": '"n/a"',         "reason": "Placeholder value"},
+    {"faculty": "Engr. Adrian Cruz",      "text": "grr",           "reason": "Numbers/symbols only",   "type": "gibberish"},
+    {"faculty": "Engr. Maria Lim",        "text": "asdasdasd",     "reason": "Random characters",      "type": "gibberish"},
+    {"faculty": "Engr. Ramon Santos",     "text": "DINOROBONG",    "reason": "Keyboard pattern",       "type": "gibberish"},
+    {"faculty": "Engr. Jose Dela Rosa",   "text": "67",            "reason": "Numbers only",           "type": "gibberish"},
+    {"faculty": "Engr. Clara Torres",     "text": "Magaling siya naman", "reason": "Tagalog detected", "type": "tagalog"},
+    {"faculty": "Engr. Bernard Villanueva","text": "okay lang po", "reason": "Tagalog detected",       "type": "tagalog"},
+    {"faculty": "Engr. Angela Gomez",     "text": "lkjhgfdsa",     "reason": "Keyboard pattern",       "type": "gibberish"},
+    {"faculty": "Engr. Eduardo Reyes",    "text": "Mahirap yung subjects", "reason": "Tagalog detected","type": "tagalog"},
+    {"faculty": "Engr. Adrian Cruz",      "text": "n/a",           "reason": "Placeholder value",      "type": "gibberish"},
+    {"faculty": "Engr. Maria Lim",        "text": "123456",        "reason": "Numbers only",           "type": "gibberish"},
 ]
 
 LATEST_COMMENTS = [
@@ -228,12 +244,74 @@ STATS = {
 }
 
 # ---------------------------------------------------------------------------
+# NOISE DETECTION (Obj 1.1) — frontend-side validation
+# ---------------------------------------------------------------------------
+
+# Common Tagalog words/markers
+TAGALOG_WORDS = {
+    "yung","ng","mga","naman","kasi","po","ako","siya","niya","nila",
+    "kami","kayo","tayo","ito","iyon","dito","doon","at","sa","na",
+    "ang","mga","pero","kaya","lang","din","rin","pala","talaga",
+    "parang","kahit","kung","dahil","para","may","wala","hindi",
+    "oo","opo","nope","yep","yep","sige","okay","ok","grabe",
+    "sobra","lagi","palagi","minsan","madalas","basta","ganon",
+    "ganyan","ganito","pwede","di","daw","raw","ba","nga","eh",
+    "ay","ha","huh","ano","bakit","saan","kailan","sino",
+    "magaling","mahirap","madali","masaya","malungkot","maganda",
+    "pangit","mahal","mura","bago","luma","mabuti","masama",
+    "okay lang","hindi naman","maayos","marami","konti","lahat",
+    "walang","mayroong","gustong","gusto","ayaw","kailangan",
+    "nagtuturo","nagtuturo","nagpapaliwanag","inirerekumenda",
+    "sinasabi","sinabi","binibigay","ibinigay","tinuturuan",
+    "itinuturo","ginagawa","ginawa","gagawin"
+}
+
+def detect_noise(text):
+    """
+    Returns a dict: { "is_noise": bool, "reason": str, "type": str }
+    Types: "tagalog", "gibberish", "too_short", "numbers_only", "clean"
+    """
+    t = text.strip()
+
+    # Too short
+    if len(t) < 5:
+        return {"is_noise": True, "reason": "Response is too short", "type": "too_short"}
+
+    # Numbers / symbols only
+    if re.match(r'^[\d\s\W]+$', t):
+        return {"is_noise": True, "reason": "Numbers or symbols only", "type": "gibberish"}
+
+    # Repeated characters (e.g. aaaaaaa, lkjhgfds)
+    if re.match(r'^(.)\1{4,}$', t):
+        return {"is_noise": True, "reason": "Repeated characters", "type": "gibberish"}
+
+    # No vowels at all (keyboard spam)
+    letters = re.sub(r'[^a-zA-Z]', '', t)
+    if len(letters) > 4:
+        vowels = re.sub(r'[^aeiouAEIOU]', '', letters)
+        if len(vowels) == 0:
+            return {"is_noise": True, "reason": "Keyboard pattern detected", "type": "gibberish"}
+
+    # Tagalog detection
+    words = re.findall(r'\b\w+\b', t.lower())
+    tagalog_hits = [w for w in words if w in TAGALOG_WORDS]
+    if len(tagalog_hits) >= 2 or (len(tagalog_hits) >= 1 and len(words) <= 4):
+        return {"is_noise": True, "reason": f"Tagalog detected: {', '.join(tagalog_hits)}", "type": "tagalog"}
+
+    return {"is_noise": False, "reason": "", "type": "clean"}
+
+# ---------------------------------------------------------------------------
 # ROUTES
 # ---------------------------------------------------------------------------
 
 @app.route("/")
-def welcome():
-    return render_template("index.html")
+def index():
+    if session.get("logged_in"):
+        if session.get("role") == "student":
+            return redirect(url_for("student_dashboard"))
+        else:
+            return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -242,11 +320,15 @@ def login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
-        if ADMIN_CREDENTIALS.get(username) == password:
+        user = USERS.get(username)
+        if user and user["password"] == password:
             session["logged_in"] = True
             session["username"] = username
-            next_page = request.args.get("next", "/dashboard")
-            return redirect(next_page)
+            session["role"] = user["role"]
+            if user["role"] == "student":
+                return redirect(url_for("student_dashboard"))
+            else:
+                return redirect(url_for("admin_dashboard"))
         else:
             error = "Invalid username or password."
     return render_template("login.html", error=error)
@@ -255,51 +337,119 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("welcome"))
+    return redirect(url_for("login"))
 
 
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template("dashboard.html",
+# ---- STUDENT ROUTES ----
+
+@app.route("/student/dashboard")
+@login_required(role="student")
+def student_dashboard():
+    return render_template("student_dashboard.html", faculty=FACULTY)
+
+
+@app.route("/student/evaluate/<int:faculty_id>", methods=["GET"])
+@login_required(role="student")
+def evaluate(faculty_id):
+    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
+    if not member:
+        return redirect(url_for("student_dashboard"))
+    return render_template("evaluate.html", member=member)
+
+
+@app.route("/student/submit/<int:faculty_id>", methods=["POST"])
+@login_required(role="student")
+def submit_evaluation(faculty_id):
+    """
+    Obj 1.1 — Noise filtration on submission.
+    Checks for Tagalog, gibberish, too-short, numbers-only.
+    """
+    data = request.json
+    text = data.get("text", "").strip()
+    rating = data.get("rating", 0)
+
+    if not text:
+        return jsonify({"status": "error", "message": "Please enter your feedback."}), 400
+
+    noise = detect_noise(text)
+
+    if noise["is_noise"]:
+        # Log it (in production this goes to DB)
+        member = next((f for f in FACULTY if f["id"] == faculty_id), None)
+        if member:
+            NOISE_LOG.append({
+                "faculty": member["name"],
+                "text": text,
+                "reason": noise["reason"],
+                "type": noise["type"]
+            })
+            STATS["noise_filtered"] = len(NOISE_LOG)
+
+        if noise["type"] == "tagalog":
+            return jsonify({
+                "status": "noise",
+                "type": "tagalog",
+                "message": "Please write your feedback in English. Tagalog responses cannot be processed by our system."
+            })
+        else:
+            return jsonify({
+                "status": "noise",
+                "type": "gibberish",
+                "message": "Your response appears to be invalid. Please write a meaningful evaluation in English."
+            })
+
+    # Valid — mock sentiment for now
+    import random
+    label = random.choice(["Positive", "Neutral", "Negative"])
+    return jsonify({
+        "status": "success",
+        "label": label,
+        "message": "Thank you for completing this semester's evaluation. Your feedback has been recorded."
+    })
+
+
+# ---- ADMIN ROUTES ----
+
+@app.route("/admin/dashboard")
+@login_required(role="admin")
+def admin_dashboard():
+    # Noise stats for Obj 1.1
+    tagalog_count  = sum(1 for n in NOISE_LOG if n["type"] == "tagalog")
+    gibberish_count = sum(1 for n in NOISE_LOG if n["type"] != "tagalog")
+
+    return render_template("admin_dashboard.html",
                            stats=STATS,
                            latest_comments=LATEST_COMMENTS,
-                           noise_log=NOISE_LOG)
+                           noise_log=NOISE_LOG,
+                           tagalog_count=tagalog_count,
+                           gibberish_count=gibberish_count,
+                           faculty=FACULTY)
 
 
-@app.route("/advisors")
-@login_required
+@app.route("/admin/faculty/<int:faculty_id>")
+@login_required(role="admin")
+def admin_faculty(faculty_id):
+    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
+    if not member:
+        return redirect(url_for("admin_dashboard"))
+    faculty_noise = [n for n in NOISE_LOG if n["faculty"] == member["name"]]
+    return render_template("faculty.html", member=member, faculty_noise=faculty_noise)
+
+
+@app.route("/admin/advisors")
+@login_required(role="admin")
 def advisors():
     query = request.args.get("q", "").lower()
     results = [f for f in FACULTY if query in f["name"].lower()] if query else FACULTY
     return render_template("advisors.html", faculty=results, query=query)
 
 
-@app.route("/faculty/<int:faculty_id>")
-@login_required
-def faculty(faculty_id):
-    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
-    if not member:
-        return redirect(url_for("advisors"))
-    return render_template("faculty.html", member=member)
-
-
-@app.route("/submit_feedback/<int:faculty_id>", methods=["POST"])
-def submit_feedback(faculty_id):
-    """
-    Stub endpoint — in production this would run noise filtration,
-    normalization, sentiment classification, and summarization.
-    For now it just echoes back a mock sentiment result.
-    Students do NOT need to be logged in to submit feedback.
-    """
+# ---- NOISE CHECK API (called by JS before submit) ----
+@app.route("/api/check_noise", methods=["POST"])
+def check_noise_api():
     text = request.json.get("text", "").strip()
-    if not text:
-        return jsonify({"error": "Empty feedback"}), 400
-
-    # Mock sentiment (rotate through for demo purposes)
-    import random
-    label = random.choice(["Positive", "Neutral", "Negative"])
-    return jsonify({"label": label, "message": "Feedback submitted successfully."})
+    result = detect_noise(text)
+    return jsonify(result)
 
 
 if __name__ == "__main__":

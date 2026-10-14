@@ -5,84 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login — Sense</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     .login-page {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0F0F2D 0%, #1A1240 50%, #16073A 100%);
+      background: #1A1A1A;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
     }
 
-    .login-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px;
+    .login-wrap {
+      display: flex;
+      gap: 0;
       width: 100%;
-      max-width: 400px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 860px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
     }
 
-    .login-logo {
+    /* Left panel */
+    .login-left {
+      background: #FFD100;
+      padding: 48px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-left-logo {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 28px;
+      margin-bottom: 40px;
     }
 
-    .login-logo-box {
-      width: 40px; height: 40px;
-      background: var(--purple);
+    .login-left-logo-box {
+      width: 42px; height: 42px;
+      background: #1A1A1A;
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      font-size: 20px;
     }
 
-    .login-logo-name { font-size: 18px; font-weight: 800; color: var(--text-primary); }
-    .login-logo-sub  { font-size: 11px; color: var(--text-muted); }
+    .login-left-logo-name { font-size: 20px; font-weight: 900; color: #1A1A1A; }
+    .login-left-logo-sub  { font-size: 11px; color: rgba(0,0,0,0.55); font-weight: 500; }
 
-    .login-title {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 4px;
+    .login-left h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #1A1A1A;
+      line-height: 1.15;
+      margin-bottom: 12px;
     }
 
-    .login-subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 28px;
-      line-height: 1.5;
+    .login-left p {
+      font-size: 14px;
+      color: rgba(0,0,0,0.6);
+      line-height: 1.6;
     }
 
-    .form-group {
-      margin-bottom: 16px;
+    /* Role cards */
+    .role-cards {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
     }
 
+    .role-card {
+      flex: 1;
+      background: rgba(0,0,0,0.08);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .role-card:hover { background: rgba(0,0,0,0.14); }
+    .role-card.selected { background: #1A1A1A; border-color: #1A1A1A; }
+    .role-card.selected .role-label { color: #FFD100; }
+    .role-card.selected .role-icon  { filter: none; }
+
+    .role-icon  { font-size: 28px; margin-bottom: 6px; display: block; }
+    .role-label { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+
+    /* Right panel */
+    .login-right {
+      background: #FFFFFF;
+      padding: 48px 40px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-right h2 { font-size: 22px; font-weight: 800; color: #1A1A1A; margin-bottom: 6px; }
+    .login-right p  { font-size: 13px; color: #777; margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 16px; }
     .form-label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 700;
+      color: #1A1A1A;
       margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .form-input {
       width: 100%;
       padding: 11px 14px;
-      border: 1.5px solid var(--border);
+      border: 1.5px solid #E0E0E0;
       border-radius: 8px;
       font-size: 14px;
       font-family: inherit;
-      color: var(--text-primary);
+      color: #1A1A1A;
       outline: none;
       transition: border-color 0.2s;
-      background: #fff;
     }
-    .form-input:focus { border-color: var(--purple); }
-    .form-input::placeholder { color: var(--text-muted); }
+    .form-input:focus { border-color: #FFD100; }
+    .form-input::placeholder { color: #AAAAAA; }
 
     .btn-login {
       width: 100%;
@@ -93,95 +141,116 @@
       font-size: 15px;
       font-weight: 700;
       margin-top: 8px;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.2s;
       border: none;
       cursor: pointer;
     }
-    .btn-login:hover { background: #2D2D2D; transform: translateY(-1px); }
+    .btn-login:hover { background: #333333; }
 
     .error-msg {
       background: #FFE8E3;
-      color: var(--red);
+      color: #C0392B;
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 13px;
       margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .login-footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .login-footer a {
-      color: var(--purple);
-      font-weight: 500;
-    }
-
-    .login-note {
+    .hint-box {
       margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
+      padding: 14px;
+      background: #F9F9F9;
+      border-radius: 8px;
       font-size: 12px;
-      color: var(--text-muted);
-      text-align: center;
-      line-height: 1.6;
+      color: #888;
+      line-height: 1.7;
+    }
+    .hint-box strong { color: #1A1A1A; }
+
+    @media (max-width: 640px) {
+      .login-wrap { flex-direction: column; }
+      .login-right { width: 100%; }
     }
   </style>
 </head>
 <body>
 <div class="login-page">
-  <div class="login-card">
+  <div class="login-wrap">
 
-    <!-- Logo -->
-    <div class="login-logo">
-      <div class="login-logo-box">💬</div>
-      <div>
-        <div class="login-logo-name">Sense</div>
-        <div class="login-logo-sub">Student Portal</div>
+    <!-- Left -->
+    <div class="login-left">
+      <div class="login-left-logo">
+        <div class="login-left-logo-box">💬</div>
+        <div>
+          <div class="login-left-logo-name">Sense</div>
+          <div class="login-left-logo-sub">Student Portal — TIP</div>
+        </div>
+      </div>
+
+      <h1>Every feedback<br>shapes better<br>education.</h1>
+      <p>Sentiment Faculty Evaluation Analysis System.<br>Safe, anonymous, and constructive.</p>
+
+      <!-- Role selector -->
+      <div class="role-cards">
+        <div class="role-card selected" id="roleStudent" onclick="selectRole('student')">
+          <span class="role-icon">👩‍🎓</span>
+          <span class="role-label">Student</span>
+        </div>
+        <div class="role-card" id="roleAdmin" onclick="selectRole('admin')">
+          <span class="role-icon">👩‍🏫</span>
+          <span class="role-label">Faculty / Admin</span>
+        </div>
       </div>
     </div>
 
-    <h1 class="login-title">Admin Login</h1>
-    <p class="login-subtitle">Authorized personnel only. Student feedback submission does not require login.</p>
+    <!-- Right -->
+    <div class="login-right">
+      <h2 id="loginTitle">Student Login</h2>
+      <p id="loginSubtitle">Sign in to submit your faculty evaluation.</p>
 
-    <!-- Error -->
-    {% if error %}
-    <div class="error-msg">⚠ {{ error }}</div>
-    {% endif %}
+      {% if error %}
+      <div class="error-msg">⚠ {{ error }}</div>
+      {% endif %}
 
-    <!-- Form -->
-    <form method="POST" action="{{ url_for('login', next=request.args.get('next', '')) }}">
-      <div class="form-group">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-input" type="text" id="username" name="username"
-               placeholder="Enter your username" autocomplete="username" required />
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input class="form-input" type="text" name="username" id="usernameInput"
+                 placeholder="Enter username" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" name="password"
+                 placeholder="Enter password" autocomplete="current-password" required />
+        </div>
+        <button class="btn-login" type="submit">Sign in →</button>
+      </form>
+
+      <div class="hint-box">
+        <strong>Demo credentials:</strong><br>
+        Student: <strong>student</strong> / <strong>student123</strong><br>
+        Faculty/Admin: <strong>admin</strong> / <strong>admin123</strong>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-input" type="password" id="password" name="password"
-               placeholder="Enter your password" autocomplete="current-password" required />
-      </div>
-
-      <button class="btn-login" type="submit">Sign in →</button>
-    </form>
-
-    <div class="login-footer">
-      <a href="/">← Back to welcome page</a>
-    </div>
-
-    <div class="login-note">
-      🔒 This dashboard is for authorized academic administrators only.<br>
-      Student feedback is kept anonymous and confidential.
     </div>
 
   </div>
 </div>
+
+<script>
+  function selectRole(role) {
+    document.getElementById('roleStudent').classList.toggle('selected', role === 'student');
+    document.getElementById('roleAdmin').classList.toggle('selected', role === 'admin');
+
+    if (role === 'student') {
+      document.getElementById('loginTitle').textContent = 'Student Login';
+      document.getElementById('loginSubtitle').textContent = 'Sign in to submit your faculty evaluation.';
+      document.getElementById('usernameInput').placeholder = 'e.g. student';
+    } else {
+      document.getElementById('loginTitle').textContent = 'Faculty / Admin Login';
+      document.getElementById('loginSubtitle').textContent = 'Sign in to view evaluation results and analytics.';
+      document.getElementById('usernameInput').placeholder = 'e.g. admin';
+    }
+  }
+</script>
 </body>
 </html>

@@ -65,13 +65,15 @@
       {% if faculty %}
       <div class="faculty-grid">
         {% for f in faculty %}
-        <a href="/faculty/{{ f.id }}" class="faculty-card">
+        <a href="/admin/faculty/{{ f.id }}" class="faculty-card">
           <div class="faculty-card-top">
             <div class="avatar" style="background: {{ f.color }}">{{ f.initials }}</div>
             <div class="btn-arrow">›</div>
           </div>
           <div class="faculty-name">{{ f.name }}</div>
           <div class="faculty-role">{{ f.role }}</div>
+          <hr class="faculty-divider" />
+          <span class="subject-tag">{{ f.subject }}</span>
         </a>
         {% endfor %}
       </div>
