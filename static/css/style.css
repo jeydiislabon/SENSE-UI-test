@@ -23,12 +23,12 @@
   --navy-mid:     #2D2D2D;
   --navy-card:    #3A3A3A;
 
-  --bg:           #FFD100;
+  --bg:           #F2F2F2;
   --sidebar-bg:   #1A1A1A;
   --card-bg:      #FFFFFF;
   --text-primary: #1A1A1A;
   --text-muted:   #666666;
-  --border:       #E8E000;
+  --border:       #E0E0E0;
 
   --positive:     #27AE60;
   --neutral:      #E67E22;
@@ -248,8 +248,8 @@ input { font-family: inherit; }
 /* ---- Topbar ---- */
 .topbar {
   height: 60px;
-  background: #FFD100;
-  border-bottom: none;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E0E0E0;
   display: flex;
   align-items: center;
   padding: 0 32px;
@@ -262,8 +262,8 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0,0,0,0.1);
-  border: 1.5px solid rgba(0,0,0,0.2);
+  background: #F2F2F2;
+  border: 1.5px solid #E0E0E0;
   border-radius: 8px;
   padding: 8px 14px;
   width: 280px;
@@ -277,8 +277,8 @@ input { font-family: inherit; }
   width: 100%;
   font-weight: 500;
 }
-.search-box input::placeholder { color: rgba(0,0,0,0.45); }
-.search-icon { color: rgba(0,0,0,0.5); font-size: 14px; }
+.search-box input::placeholder { color: #999999; }
+.search-icon { color: #999999; font-size: 14px; }
 
 /* ---- Page body ---- */
 .page-body { padding: 32px; flex: 1; }
@@ -286,9 +286,9 @@ input { font-family: inherit; }
 /* ============================================================
    DASHBOARD
    ============================================================ */
-.page-label { font-size: 13px; color: rgba(0,0,0,0.5); margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.page-title { font-size: 28px; font-weight: 900; color: #1A1A1A; margin-bottom: 4px; text-transform: uppercase; letter-spacing: -0.5px; }
-.page-subtitle { font-size: 13px; color: rgba(0,0,0,0.55); margin-bottom: 28px; }
+.page-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.page-title { font-size: 28px; font-weight: 800; color: #1A1A1A; margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
 
 /* Stats row */
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
