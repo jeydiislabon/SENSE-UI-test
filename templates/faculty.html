@@ -61,7 +61,12 @@
   <div class="main-content">
     <header class="topbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/>
+            <path d="m21 21-4.35-4.35" stroke="#999" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
         <input type="text" placeholder="Search faculty or feedback" id="globalSearch" />
       </div>
     </header>
@@ -102,7 +107,12 @@
           <!-- Sentiment Overview -->
           <div class="card">
             <div class="sentiment-header">
-              <div class="sentiment-title">📈 Sentiment overview</div>
+            <div class="sentiment-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:6px;">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Sentiment overview
+            </div>
               <div class="sentiment-count">Based on {{ member.comments | length }} comments</div>
             </div>
 
@@ -137,7 +147,12 @@
 
           <!-- Comment Summary -->
           <div class="card">
-            <div class="summary-label">💬 Comment Summary</div>
+            <div class="summary-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Comment Summary
+            </div>
             <p class="summary-text">{{ member.summary }}</p>
             <div class="summary-note">
               This summary is generated from constructive student feedback. Noise entries are excluded.
@@ -155,20 +170,6 @@
             <div class="chart-wrap">
               <canvas id="sentimentChart"></canvas>
             </div>
-          </div>
-
-          <!-- Feedback Form -->
-          <div class="card">
-            <div class="feedback-form-title">Share your feedback</div>
-            <p class="feedback-form-sub">Your response is anonymous. Please keep it specific and constructive.</p>
-            <textarea class="feedback-textarea" id="feedbackText"
-              placeholder="What would you like to share about {{ member.name }}?"></textarea>
-            <p class="feedback-note">Sentiment is analyzed automatically</p>
-            <button class="btn-submit" id="submitBtn"
-              {% if not member.accepting %}disabled{% endif %}>
-              {% if member.accepting %}Submit feedback{% else %}Feedback closed{% endif %}
-            </button>
-            <div class="feedback-result" id="feedbackResult"></div>
           </div>
 
           <!-- Recent Feedback -->
@@ -228,33 +229,10 @@
     }
   });
 
-  // ---- Feedback Submit ----
-  const facultyId = {{ member.id }};
-  document.getElementById('submitBtn').addEventListener('click', async function() {
-    const text = document.getElementById('feedbackText').value.trim();
-    if (!text) { alert('Please enter your feedback first.'); return; }
-
-    this.disabled = true;
-    this.textContent = 'Submitting…';
-
-    try {
-      const res = await fetch(`/submit_feedback/${facultyId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      const data = await res.json();
-
-      const result = document.getElementById('feedbackResult');
-      result.className = 'feedback-result show ' + data.label.toLowerCase();
-      result.textContent = `✓ ${data.message} Sentiment detected: ${data.label}`;
-
-      document.getElementById('feedbackText').value = '';
-    } catch(e) {
-      alert('Something went wrong. Please try again.');
-    } finally {
-      this.disabled = false;
-      this.textContent = 'Submit feedback';
+  // Global search
+  document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/admin/advisors?q=' + encodeURIComponent(this.value.trim());
     }
   });
 
