@@ -1,9 +1,32 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from functools import wraps
 import re
+import json
+import os
 
 app = Flask(__name__)
 app.secret_key = "sense-secret-key-change-in-production"
+
+# ---------------------------------------------------------------------------
+# PERSISTENT STORAGE — simple JSON file for demo purposes
+# ---------------------------------------------------------------------------
+DATA_FILE = os.path.join(os.path.dirname(__file__), "submissions.json")
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r") as f:
+                return json.load(f)
+        except:
+            pass
+    return {"noise_log": [], "valid_submissions": []}
+
+def save_data(data):
+    try:
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f)
+    except:
+        pass
 
 # ---------------------------------------------------------------------------
 # FIXED CREDENTIALS — replace with DB lookup after Jamie's backend merges
@@ -405,16 +428,16 @@ def submit_evaluation(faculty_id):
     noise = detect_noise(text)
 
     if noise["is_noise"]:
-        # Log it (in production this goes to DB)
         member = next((f for f in FACULTY if f["id"] == faculty_id), None)
         if member:
-            NOISE_LOG.append({
+            data = load_data()
+            data["noise_log"].append({
                 "faculty": member["name"],
                 "text": text,
                 "reason": noise["reason"],
                 "type": noise["type"]
             })
-            STATS["noise_filtered"] = len(NOISE_LOG)
+            save_data(data)
 
         if noise["type"] == "tagalog":
             return jsonify({
@@ -429,12 +452,13 @@ def submit_evaluation(faculty_id):
                 "message": "Your response appears to be invalid. Please write a meaningful evaluation in English."
             })
 
-    # Valid — store in VALID_SUBMISSIONS
+    # Valid — store in file
     import random
     label = random.choice(["Positive", "Neutral", "Negative"])
     member = next((f for f in FACULTY if f["id"] == faculty_id), None)
     if member:
-        VALID_SUBMISSIONS.append({
+        data = load_data()
+        data["valid_submissions"].append({
             "faculty":  member["name"],
             "initials": member["initials"],
             "color":    member["color"],
@@ -442,7 +466,7 @@ def submit_evaluation(faculty_id):
             "rating":   rating,
             "label":    label,
         })
-        STATS["total_feedback"] = 248 + len(VALID_SUBMISSIONS)
+        save_data(data)
     return jsonify({
         "status": "success",
         "label": label,
@@ -460,8 +484,9 @@ def teacher_dashboard():
     if not member:
         return redirect(url_for("logout"))
 
-    # Get this teacher's noise entries
-    my_noise = [n for n in NOISE_LOG if n["faculty"] == member["name"]]
+    stored = load_data()
+    combined_noise = NOISE_LOG + stored["noise_log"]
+    my_noise = [n for n in combined_noise if n["faculty"] == member["name"]]
     tagalog_count  = sum(1 for n in my_noise if n["type"] == "tagalog")
     gibberish_count = sum(1 for n in my_noise if n["type"] != "tagalog")
 
@@ -477,15 +502,24 @@ def teacher_dashboard():
 @app.route("/admin/dashboard")
 @login_required(role="admin")
 def admin_dashboard():
-    # Noise stats for Obj 1.1
-    tagalog_count  = sum(1 for n in NOISE_LOG if n["type"] == "tagalog")
-    gibberish_count = sum(1 for n in NOISE_LOG if n["type"] != "tagalog")
+    stored = load_data()
+    combined_noise = NOISE_LOG + stored["noise_log"]
+    combined_valid = VALID_SUBMISSIONS + stored["valid_submissions"]
+
+    tagalog_count   = sum(1 for n in combined_noise if n["type"] == "tagalog")
+    gibberish_count = sum(1 for n in combined_noise if n["type"] != "tagalog")
+
+    stats = {
+        "total_feedback": 248 + len(combined_valid),
+        "total_advisors": len(FACULTY),
+        "noise_filtered": len(combined_noise),
+    }
 
     return render_template("admin_dashboard.html",
-                           stats=STATS,
+                           stats=stats,
                            latest_comments=LATEST_COMMENTS,
-                           noise_log=NOISE_LOG,
-                           valid_submissions=VALID_SUBMISSIONS,
+                           noise_log=combined_noise,
+                           valid_submissions=combined_valid,
                            tagalog_count=tagalog_count,
                            gibberish_count=gibberish_count,
                            faculty=FACULTY)
