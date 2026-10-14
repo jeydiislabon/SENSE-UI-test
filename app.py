@@ -334,18 +334,25 @@ def login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
+        selected_role = request.form.get("selected_role", "student").strip()
         user = USERS.get(username)
+
         if user and user["password"] == password:
-            session["logged_in"] = True
-            session["username"] = username
-            session["role"] = user["role"]
-            session["faculty_id"] = user.get("faculty_id")
-            if user["role"] == "student":
-                return redirect(url_for("student_dashboard"))
-            elif user["role"] == "teacher":
-                return redirect(url_for("teacher_dashboard"))
+            # Block if selected role doesn't match account role
+            if user["role"] != selected_role:
+                role_labels = {"student": "Student", "teacher": "Teacher", "admin": "Admin"}
+                error = f"This account is not a {role_labels.get(selected_role, selected_role)} account. Please select the correct role."
             else:
-                return redirect(url_for("admin_dashboard"))
+                session["logged_in"] = True
+                session["username"] = username
+                session["role"] = user["role"]
+                session["faculty_id"] = user.get("faculty_id")
+                if user["role"] == "student":
+                    return redirect(url_for("student_dashboard"))
+                elif user["role"] == "teacher":
+                    return redirect(url_for("teacher_dashboard"))
+                else:
+                    return redirect(url_for("admin_dashboard"))
         else:
             error = "Invalid username or password."
     return render_template("login.html", error=error)

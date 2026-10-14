@@ -237,6 +237,7 @@
       {% endif %}
 
       <form method="POST" action="{{ url_for('login') }}">
+        <input type="hidden" name="selected_role" id="selectedRole" value="student" />
         <div class="form-group">
           <label class="form-label">Username</label>
           <input class="form-input" type="text" name="username" id="usernameInput"
@@ -266,6 +267,7 @@
     document.getElementById('roleStudent').classList.toggle('selected', role === 'student');
     document.getElementById('roleTeacher').classList.toggle('selected', role === 'teacher');
     document.getElementById('roleAdmin').classList.toggle('selected', role === 'admin');
+    document.getElementById('selectedRole').value = role;
 
     const titles = {
       student: ['Student Login', 'Sign in to submit your faculty evaluation.', 'e.g. student'],

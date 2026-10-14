@@ -6,40 +6,18 @@
   <title>Admin Dashboard — Sense</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    .obj-section {
-      margin-bottom: 32px;
-    }
+    .section-block { margin-bottom: 32px; }
 
-    .obj-header {
+    .section-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       margin-bottom: 16px;
     }
 
-    .obj-badge {
-      background: #1A1A1A;
-      color: #FFD100;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 6px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .obj-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #1A1A1A;
-    }
-
-    .obj-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
+    .section-title { font-size: 17px; font-weight: 800; color: #1A1A1A; }
+    .section-desc  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 
     /* Noise table */
     .noise-table {
@@ -58,17 +36,14 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-
     .noise-table th:first-child { border-radius: 8px 0 0 8px; }
     .noise-table th:last-child  { border-radius: 0 8px 8px 0; }
-
     .noise-table td {
       padding: 11px 14px;
       border-bottom: 1px solid var(--border);
       color: var(--text-primary);
       vertical-align: middle;
     }
-
     .noise-table tr:last-child td { border-bottom: none; }
     .noise-table tr:hover td { background: #F9F9F9; }
 
@@ -82,17 +57,18 @@
     }
 
     .noise-type-badge {
-      display: inline-block;
-      padding: 3px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
     }
-    .noise-type-badge.tagalog  { background: #FFF3CD; color: #7A5C00; }
+    .noise-type-badge.tagalog   { background: #FFF3CD; color: #7A5C00; }
     .noise-type-badge.gibberish { background: #FFE8E3; color: #922B21; }
     .noise-type-badge.too_short { background: #E8F4FD; color: #1A5276; }
 
-    /* Noise summary cards */
     .noise-summary {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -107,15 +83,12 @@
       box-shadow: var(--shadow);
       border-left: 4px solid #FFD100;
     }
-
-    .noise-summary-card.tagalog  { border-left-color: #F39C12; }
+    .noise-summary-card.tagalog   { border-left-color: #F39C12; }
     .noise-summary-card.gibberish { border-left-color: #E74C3C; }
-    .noise-summary-card.total    { border-left-color: #FFD100; }
 
     .noise-summary-num   { font-size: 32px; font-weight: 900; color: #1A1A1A; }
     .noise-summary-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-    /* Filter tabs */
     .filter-tabs {
       display: flex;
       gap: 8px;
@@ -136,14 +109,13 @@
     .filter-tab.active { background: #1A1A1A; color: #FFD100; border-color: #1A1A1A; }
     .filter-tab:hover  { border-color: #1A1A1A; }
 
-    /* Chart placeholders */
     .chart-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
 
-    .coming-soon {
+    .pending-card {
       background: var(--card-bg);
       border-radius: var(--radius);
       padding: 40px 24px;
@@ -151,12 +123,12 @@
       text-align: center;
       color: var(--text-muted);
     }
-    .coming-soon-icon  { font-size: 36px; margin-bottom: 12px; }
-    .coming-soon-title { font-size: 15px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
-    .coming-soon-text  { font-size: 13px; line-height: 1.5; }
-    .coming-soon-badge {
+    .pending-card-icon  { margin-bottom: 14px; display: flex; justify-content: center; color: #ccc; }
+    .pending-card-title { font-size: 15px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+    .pending-card-text  { font-size: 13px; line-height: 1.6; max-width: 280px; margin: 0 auto; }
+    .pending-card-badge {
       display: inline-block;
-      margin-top: 12px;
+      margin-top: 14px;
       background: #F2F2F2;
       color: var(--text-muted);
       font-size: 11px;
@@ -173,7 +145,7 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-box">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#FFD100" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
@@ -183,20 +155,41 @@
     <div class="sidebar-section-label">Workspace</div>
     <nav class="sidebar-nav">
       <a href="/admin/dashboard" class="nav-item active">
-        <span class="nav-icon">⊞</span> <span>Dashboard</span>
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>Dashboard</span>
       </a>
       <a href="/admin/advisors" class="nav-item">
-        <span class="nav-icon">👥</span> <span>Advisors</span>
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="17" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M17 14c1.7 0 4 1.2 4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Advisors</span>
       </a>
     </nav>
 
     <div class="sidebar-footer">
       <div class="voice-card">
-        <h4>Your voice matters</h4>
-        <p>Feedback stays anonymous and helps our faculty improve.</p>
+        <h4>Admin Panel</h4>
+        <p>Manage and review all faculty evaluation data.</p>
       </div>
       <a href="/logout" class="btn-exit">
-        <span>↩</span> <span>Logout</span>
+        <span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>Logout</span>
       </a>
     </div>
   </aside>
@@ -205,7 +198,12 @@
   <div class="main-content">
     <header class="topbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/>
+            <path d="m21 21-4.35-4.35" stroke="#999" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
         <input type="text" placeholder="Search faculty or feedback" id="globalSearch" />
       </div>
     </header>
@@ -213,46 +211,61 @@
     <div class="page-body">
       <p class="page-label">Admin Dashboard</p>
       <h1 class="page-title">Overview</h1>
-      <p class="page-subtitle">Evaluation analytics and NLP pipeline results across all faculty.</p>
+      <p class="page-subtitle">Evaluation results and analytics across all faculty.</p>
 
       <!-- Stats row -->
       <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-icon purple">💬</div>
+          <div class="stat-icon purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <div class="stat-number">{{ stats.total_feedback }}</div>
           <div class="stat-label">Total Feedback</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon blue">👥</div>
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
+              <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="17" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
+              <path d="M17 14c1.7 0 4 1.2 4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
           <div class="stat-number">{{ stats.total_advisors }}</div>
           <div class="stat-label">Advisors</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon yellow">🚫</div>
+          <div class="stat-icon yellow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+              <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
           <div class="stat-number">{{ stats.noise_filtered }}</div>
           <div class="stat-label">Noise Filtered</div>
         </div>
       </div>
 
-      <!-- OBJ 1.1 — Noise Filtration Report -->
-      <div class="obj-section">
-        <div class="obj-header">
-          <span class="obj-badge">Obj 1.1</span>
+      <!-- Noise Filtration Report -->
+      <div class="section-block">
+        <div class="section-header">
           <div>
-            <div class="obj-title">Noise Filtration Report</div>
-            <div class="obj-desc">Invalid comments automatically detected and removed before analysis</div>
+            <div class="section-title">Invalid Comments Report</div>
+            <div class="section-desc">Comments automatically detected and removed before analysis</div>
           </div>
         </div>
 
-        <!-- Summary cards -->
         <div class="noise-summary">
-          <div class="noise-summary-card total">
+          <div class="noise-summary-card">
             <div class="noise-summary-num">{{ noise_log | length }}</div>
             <div class="noise-summary-label">Total Filtered</div>
           </div>
           <div class="noise-summary-card tagalog">
             <div class="noise-summary-num">{{ tagalog_count }}</div>
-            <div class="noise-summary-label">Tagalog / Non-English</div>
+            <div class="noise-summary-label">Non-English / Tagalog</div>
           </div>
           <div class="noise-summary-card gibberish">
             <div class="noise-summary-num">{{ gibberish_count }}</div>
@@ -260,14 +273,12 @@
           </div>
         </div>
 
-        <!-- Filter tabs -->
         <div class="filter-tabs">
           <button class="filter-tab active" onclick="filterNoise('all', this)">All</button>
-          <button class="filter-tab" onclick="filterNoise('tagalog', this)">🇵🇭 Tagalog</button>
-          <button class="filter-tab" onclick="filterNoise('gibberish', this)">🚫 Gibberish</button>
+          <button class="filter-tab" onclick="filterNoise('tagalog', this)">Non-English</button>
+          <button class="filter-tab" onclick="filterNoise('gibberish', this)">Gibberish</button>
         </div>
 
-        <!-- Noise table -->
         <div class="card" style="padding:0; overflow:hidden;">
           <table class="noise-table" id="noiseTable">
             <thead>
@@ -288,9 +299,9 @@
                 <td style="color:var(--text-muted);">{{ n.reason }}</td>
                 <td>
                   <span class="noise-type-badge {{ n.type }}">
-                    {% if n.type == 'tagalog' %}🇵🇭 Tagalog
-                    {% elif n.type == 'gibberish' %}🚫 Gibberish
-                    {% else %}⚠ Invalid{% endif %}
+                    {% if n.type == 'tagalog' %}Non-English
+                    {% elif n.type == 'gibberish' %}Gibberish
+                    {% else %}Invalid{% endif %}
                   </span>
                 </td>
               </tr>
@@ -300,54 +311,58 @@
         </div>
       </div>
 
-      <!-- OBJ 1.2 — Sentiment Analytics -->
-      <div class="obj-section">
-        <div class="obj-header">
-          <span class="obj-badge">Obj 1.2</span>
+      <!-- Sentiment Analytics -->
+      <div class="section-block">
+        <div class="section-header">
           <div>
-            <div class="obj-title">Sentiment Analytics</div>
-            <div class="obj-desc">Positive, Neutral, and Negative classification per faculty</div>
+            <div class="section-title">Sentiment Analytics</div>
+            <div class="section-desc">Positive, Neutral, and Negative classification per faculty</div>
           </div>
         </div>
-
         <div class="chart-grid">
-          <div class="coming-soon">
-            <div class="coming-soon-icon">📊</div>
-            <div class="coming-soon-title">Sentiment Charts</div>
-            <div class="coming-soon-text">
-              RoBERTa sentiment classification results will appear here after the NLP pipeline is integrated.
+          <div class="pending-card">
+            <div class="pending-card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="12" width="4" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="10" y="7" width="4" height="14" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="17" y="3" width="4" height="18" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
             </div>
-            <span class="coming-soon-badge">Pending NLP Integration</span>
+            <div class="pending-card-title">Sentiment Charts</div>
+            <div class="pending-card-text">RoBERTa sentiment classification results will appear here after the NLP pipeline is connected.</div>
+            <span class="pending-card-badge">Pending NLP Integration</span>
           </div>
-          <div class="coming-soon">
-            <div class="coming-soon-icon">📈</div>
-            <div class="coming-soon-title">Sentiment Trends</div>
-            <div class="coming-soon-text">
-              Faculty-by-faculty breakdown of positive, neutral, and negative feedback over time.
+          <div class="pending-card">
+            <div class="pending-card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
-            <span class="coming-soon-badge">Pending NLP Integration</span>
+            <div class="pending-card-title">Sentiment Trends</div>
+            <div class="pending-card-text">Faculty-by-faculty breakdown of positive, neutral, and negative feedback over time.</div>
+            <span class="pending-card-badge">Pending NLP Integration</span>
           </div>
         </div>
       </div>
 
-      <!-- OBJ 1.3 — Feedback Summarization -->
-      <div class="obj-section">
-        <div class="obj-header">
-          <span class="obj-badge">Obj 1.3</span>
+      <!-- Feedback Summarization -->
+      <div class="section-block">
+        <div class="section-header">
           <div>
-            <div class="obj-title">Feedback Summarization</div>
-            <div class="obj-desc">AI-generated summaries of recurring valid feedback per faculty</div>
+            <div class="section-title">Feedback Summarization</div>
+            <div class="section-desc">AI-generated summaries of recurring valid feedback per faculty</div>
           </div>
         </div>
-
-        <div class="coming-soon">
-          <div class="coming-soon-icon">🤖</div>
-          <div class="coming-soon-title">BART Summarization Engine</div>
-          <div class="coming-soon-text">
-            Concise AI-generated summaries of student feedback will appear here once the BART model is connected.
-            Only valid, English-language feedback that passed noise filtration will be included.
+        <div class="pending-card">
+          <div class="pending-card-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </div>
-          <span class="coming-soon-badge">Pending NLP Integration</span>
+          <div class="pending-card-title">Summarization Engine</div>
+          <div class="pending-card-text">Concise AI-generated summaries will appear here once the summarization model is connected. Only valid English feedback that passed noise filtration will be included.</div>
+          <span class="pending-card-badge">Pending NLP Integration</span>
         </div>
       </div>
 
@@ -359,13 +374,8 @@
   function filterNoise(type, btn) {
     document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
-
     document.querySelectorAll('#noiseTable tbody tr').forEach(row => {
-      if (type === 'all' || row.dataset.type === type) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
+      row.style.display = (type === 'all' || row.dataset.type === type) ? '' : 'none';
     });
   }
 
