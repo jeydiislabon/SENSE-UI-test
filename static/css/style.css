@@ -170,10 +170,11 @@ input { font-family: inherit; }
 
 .sidebar-logo-box {
   width: 36px; height: 36px;
-  background: var(--yellow);
+  background: #FFD100;
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: var(--black);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .sidebar-logo-name {

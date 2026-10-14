@@ -28,13 +28,24 @@
 
     /* Left panel */
     .login-left {
-      background: #FFD100;
+      background: #1A1A1A url('/static/banner.png') center/cover no-repeat;
       padding: 48px 40px;
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
     }
+
+    .login-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      border-radius: 18px 0 0 18px;
+    }
+
+    .login-left > * { position: relative; z-index: 1; }
 
     .login-left-logo {
       display: flex;
@@ -57,14 +68,14 @@
     .login-left h1 {
       font-size: 32px;
       font-weight: 900;
-      color: #1A1A1A;
+      color: #ffffff;
       line-height: 1.15;
       margin-bottom: 12px;
     }
 
     .login-left p {
       font-size: 14px;
-      color: rgba(0,0,0,0.6);
+      color: rgba(255,255,255,0.65);
       line-height: 1.6;
     }
 
@@ -77,8 +88,8 @@
 
     .role-card {
       flex: 1;
-      background: rgba(0,0,0,0.08);
-      border: 2px solid transparent;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.2);
       border-radius: 12px;
       padding: 16px 12px;
       text-align: center;
@@ -86,13 +97,12 @@
       transition: all 0.2s;
     }
 
-    .role-card:hover { background: rgba(0,0,0,0.14); }
-    .role-card.selected { background: #1A1A1A; border-color: #1A1A1A; }
-    .role-card.selected .role-label { color: #FFD100; }
-    .role-card.selected .role-icon  { color: #FFD100; }
-
-    .role-icon  { display: flex; justify-content: center; margin-bottom: 8px; color: #1A1A1A; }
-    .role-label { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+    .role-card:hover { background: rgba(255,255,255,0.2); }
+    .role-card.selected { background: #FFD100; border-color: #FFD100; }
+    .role-card.selected .role-label { color: #1A1A1A; }
+    .role-card.selected .role-icon  { color: #1A1A1A; }
+    .role-icon  { display: flex; justify-content: center; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+    .role-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); }
 
     /* Right panel */
     .login-right {
@@ -180,19 +190,11 @@
     <!-- Left -->
     <div class="login-left">
       <div class="login-left-logo">
-        <div class="login-left-logo-box">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#FFD100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div>
-          <div class="login-left-logo-name">Sense</div>
-          <div class="login-left-logo-sub">Student Portal — TIP</div>
-        </div>
+        <img src="/static/LOGO_AND_NAME.png" alt="SENSE Student Portal" style="height:64px; object-fit:contain;" />
       </div>
 
-      <h1>Every feedback<br>shapes better<br>education.</h1>
-      <p>Sentiment Faculty Evaluation Analysis System.<br>Safe, anonymous, and constructive.</p>
+      <h1 style="color:#fff;">Every feedback<br>shapes better<br>education.</h1>
+      <p style="color:rgba(255,255,255,0.7);">Sentiment Faculty Evaluation Analysis System.<br>Safe, anonymous, and constructive.</p>
 
       <!-- Role selector -->
       <div class="role-cards">
