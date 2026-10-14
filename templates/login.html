@@ -98,6 +98,7 @@
       background: #FFFFFF;
       padding: 48px 40px;
       width: 360px;
+      min-height: 520px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -165,6 +166,11 @@
       line-height: 1.7;
     }
     .hint-box strong { color: #1A1A1A; }
+
+    /* Fix layout shift when switching roles */
+    #loginTitle    { min-height: 32px; }
+    #loginSubtitle { min-height: 40px; }
+    #usernameInput { width: 100%; }
 
     @media (max-width: 640px) {
       .login-wrap { flex-direction: column; }
