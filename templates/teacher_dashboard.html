@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Feedback — Sense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* Teacher-specific styles — personal report card feel */
+
+    .teacher-hero {
+      background: #1A1A1A;
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .teacher-hero::before {
+      content: '';
+      position: absolute;
+      right: -40px; top: -40px;
+      width: 200px; height: 200px;
+      background: #FFD100;
+      border-radius: 50%;
+      opacity: 0.08;
+    }
+
+    .teacher-hero-avatar {
+      width: 72px; height: 72px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; font-weight: 900;
+      color: #1A1A1A;
+      background: #FFD100;
+      flex-shrink: 0;
+    }
+
+    .teacher-hero-info { flex: 1; }
+    .teacher-hero-name { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .teacher-hero-role { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+
+    .teacher-hero-meta {
+      display: flex; gap: 20px; flex-wrap: wrap;
+    }
+    .teacher-hero-meta span {
+      font-size: 12px; color: rgba(255,255,255,0.45);
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .teacher-stats {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .teacher-stat { text-align: center; }
+    .teacher-stat-num   { font-size: 28px; font-weight: 900; color: #FFD100; }
+    .teacher-stat-label { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .teacher-stat-divider {
+      width: 1px; height: 40px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Main grid */
+    .teacher-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .teacher-grid-wide {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    /* Sentiment ring card */
+    .sentiment-ring-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sentiment-ring-title {
+      font-size: 15px; font-weight: 800;
+      color: #1A1A1A;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+
+    .sentiment-pcts {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .sentiment-pct-item { text-align: center; }
+    .sentiment-pct-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      margin: 0 auto 4px;
+    }
+    .sentiment-pct-val   { font-size: 20px; font-weight: 900; }
+    .sentiment-pct-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Comments card */
+    .comments-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .comments-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .comments-tab {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: #F2F2F2;
+      color: #666;
+      transition: all 0.15s;
+    }
+    .comments-tab.active          { background: #1A1A1A; color: #FFD100; }
+    .comments-tab.tab-positive    {}
+    .comments-tab.tab-neutral     {}
+    .comments-tab.tab-negative    {}
+
+    .comment-entry {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .comment-entry:last-child { border-bottom: none; }
+    .comment-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .comment-entry-anon { font-size: 12px; font-weight: 600; color: #1A1A1A; }
+    .comment-entry-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    /* Summary card */
+    .summary-card {
+      background: #1A1A1A;
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      color: #fff;
+    }
+
+    .summary-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card-badge {
+      background: #FFD100;
+      color: #1A1A1A;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .summary-card-title { font-size: 15px; font-weight: 800; color: #fff; }
+
+    .summary-card-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .summary-card-note {
+      background: rgba(255,209,0,0.12);
+      border-left: 3px solid #FFD100;
+      border-radius: 0 6px 6px 0;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+
+    /* Noise card */
+    .noise-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .noise-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .noise-card-title { font-size: 15px; font-weight: 800; color: #1A1A1A; }
+
+    .noise-count-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .noise-pill {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .noise-pill.tagalog  { background: #FFF3CD; color: #7A5C00; }
+    .noise-pill.gibberish { background: #FFE8E3; color: #922B21; }
+
+    .noise-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .noise-entry:last-child { border-bottom: none; }
+
+    .noise-entry-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .noise-entry-icon.tagalog  { background: #FFF3CD; }
+    .noise-entry-icon.gibberish { background: #FFE8E3; }
+
+    .noise-entry-text {
+      font-family: monospace;
+      font-size: 13px;
+      color: #C0392B;
+    }
+    .noise-entry-reason { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .empty-state-icon { font-size: 32px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#FFD100" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="sidebar-logo-name">Sense</span>
+    </div>
+
+    <div class="sidebar-section-label">Teacher</div>
+    <nav class="sidebar-nav">
+      <a href="/teacher/dashboard" class="nav-item active">
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>My Dashboard</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="voice-card">
+        <h4>Your report</h4>
+        <p>Only you can see the feedback submitted about you.</p>
+      </div>
+      <a href="/logout" class="btn-exit">
+        <span>↩</span> <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div style="font-size:13px; color:#666; font-weight:500;">
+        Logged in as <strong style="color:#1A1A1A;">{{ member.name }}</strong>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- Hero profile card -->
+      <div class="teacher-hero">
+        <div class="teacher-hero-avatar">{{ member.initials }}</div>
+        <div class="teacher-hero-info">
+          <div class="teacher-hero-name">{{ member.name }}</div>
+          <div class="teacher-hero-role">{{ member.role }} &bull; {{ member.subject }}</div>
+          <div class="teacher-hero-meta">
+            <span>✉ {{ member.email }}</span>
+            <span>📍 {{ member.location }}</span>
+          </div>
+        </div>
+        <div class="teacher-stats">
+          <div class="teacher-stat">
+            <div class="teacher-stat-num">{{ member.comments | length }}</div>
+            <div class="teacher-stat-label">Comments</div>
+          </div>
+          <div class="teacher-stat-divider"></div>
+          <div class="teacher-stat">
+            <div class="teacher-stat-num">{{ my_noise | length }}</div>
+            <div class="teacher-stat-label">Filtered</div>
+          </div>
+          <div class="teacher-stat-divider"></div>
+          <div class="teacher-stat">
+            <div class="teacher-stat-num">{{ member.sentiment.positive }}%</div>
+            <div class="teacher-stat-label">Positive</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top grid: sentiment ring + comments -->
+      <div class="teacher-grid" style="margin-bottom:20px;">
+
+        <!-- Sentiment ring -->
+        <div class="sentiment-ring-card">
+          <div class="sentiment-ring-title">Sentiment Overview</div>
+          <div style="width:200px; height:200px;">
+            <canvas id="sentimentChart"></canvas>
+          </div>
+          <div class="sentiment-pcts">
+            <div class="sentiment-pct-item">
+              <div class="sentiment-pct-dot" style="background:#27AE60;"></div>
+              <div class="sentiment-pct-val" style="color:#27AE60;">{{ member.sentiment.positive }}%</div>
+              <div class="sentiment-pct-label">Positive</div>
+            </div>
+            <div class="sentiment-pct-item">
+              <div class="sentiment-pct-dot" style="background:#E67E22;"></div>
+              <div class="sentiment-pct-val" style="color:#E67E22;">{{ member.sentiment.neutral }}%</div>
+              <div class="sentiment-pct-label">Neutral</div>
+            </div>
+            <div class="sentiment-pct-item">
+              <div class="sentiment-pct-dot" style="background:#E74C3C;"></div>
+              <div class="sentiment-pct-val" style="color:#E74C3C;">{{ member.sentiment.negative }}%</div>
+              <div class="sentiment-pct-label">Negative</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent comments with tabs -->
+        <div class="comments-card">
+          <div style="font-size:15px; font-weight:800; color:#1A1A1A; margin-bottom:14px;">Student Feedback</div>
+          <div class="comments-tabs">
+            <button class="comments-tab active" onclick="filterComments('all', this)">All</button>
+            <button class="comments-tab" onclick="filterComments('Positive', this)">✅ Positive</button>
+            <button class="comments-tab" onclick="filterComments('Neutral', this)">➖ Neutral</button>
+            <button class="comments-tab" onclick="filterComments('Negative', this)">❌ Negative</button>
+          </div>
+
+          <div id="commentsList">
+            {% for c in member.comments %}
+            <div class="comment-entry" data-label="{{ c.label }}">
+              <div class="comment-entry-header">
+                <span class="comment-entry-anon">Anonymous student</span>
+                <span class="badge {{ c.label | lower }}">{{ c.label }}</span>
+              </div>
+              <div class="comment-entry-text">{{ c.text }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Summary -->
+      <div class="summary-card" style="margin-bottom:20px;">
+        <div class="summary-card-header">
+          <span class="summary-card-badge">AI Summary</span>
+          <span class="summary-card-title">Feedback Summary</span>
+        </div>
+        <p class="summary-card-text">{{ member.summary }}</p>
+        <div class="summary-card-note">
+          This summary is AI-generated from valid English student feedback only. Noise entries and Tagalog responses are excluded from this analysis.
+        </div>
+      </div>
+
+      <!-- Noise / Invalid comments -->
+      <div class="noise-card">
+        <div class="noise-card-header">
+          <div class="noise-card-title">Invalid Comments About You</div>
+          <div class="noise-count-pills">
+            <span class="noise-pill tagalog">🇵🇭 {{ tagalog_count }} Tagalog</span>
+            <span class="noise-pill gibberish">🚫 {{ gibberish_count }} Gibberish</span>
+          </div>
+        </div>
+
+        {% if my_noise %}
+          {% for n in my_noise %}
+          <div class="noise-entry">
+            <div class="noise-entry-icon {{ n.type }}">
+              {% if n.type == 'tagalog' %}🇵🇭{% else %}🚫{% endif %}
+            </div>
+            <div>
+              <div class="noise-entry-text">"{{ n.text }}"</div>
+              <div class="noise-entry-reason">{{ n.reason }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            No invalid comments filtered for your account.
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+  // Sentiment donut chart
+  new Chart(document.getElementById('sentimentChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Positive', 'Neutral', 'Negative'],
+      datasets: [{
+        data: [{{ member.sentiment.positive }}, {{ member.sentiment.neutral }}, {{ member.sentiment.negative }}],
+        backgroundColor: ['#27AE60', '#E67E22', '#E74C3C'],
+        borderWidth: 0,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Comment tabs
+  function filterComments(label, btn) {
+    document.querySelectorAll('.comments-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.comment-entry').forEach(entry => {
+      entry.style.display = (label === 'all' || entry.dataset.label === label) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

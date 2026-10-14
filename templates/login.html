@@ -198,22 +198,31 @@
       <div class="role-cards">
         <div class="role-card selected" id="roleStudent" onclick="selectRole('student')">
           <span class="role-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </span>
           <span class="role-label">Student</span>
         </div>
-        <div class="role-card" id="roleAdmin" onclick="selectRole('admin')">
+        <div class="role-card" id="roleTeacher" onclick="selectRole('teacher')">
           <span class="role-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M17 3l1.5 1.5L21 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 3.5l1.5 1.5 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </span>
-          <span class="role-label">Faculty / Admin</span>
+          <span class="role-label">Teacher</span>
+        </div>
+        <div class="role-card" id="roleAdmin" onclick="selectRole('admin')">
+          <span class="role-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 12h8M8 8h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="role-label">Admin</span>
         </div>
       </div>
     </div>
@@ -244,7 +253,8 @@
       <div class="hint-box">
         <strong>Demo credentials:</strong><br>
         Student: <strong>student</strong> / <strong>student123</strong><br>
-        Faculty/Admin: <strong>admin</strong> / <strong>admin123</strong>
+        Teacher: <strong>acruz</strong> / <strong>teacher123</strong><br>
+        Admin: <strong>admin</strong> / <strong>admin123</strong>
       </div>
     </div>
 
@@ -254,17 +264,19 @@
 <script>
   function selectRole(role) {
     document.getElementById('roleStudent').classList.toggle('selected', role === 'student');
+    document.getElementById('roleTeacher').classList.toggle('selected', role === 'teacher');
     document.getElementById('roleAdmin').classList.toggle('selected', role === 'admin');
 
-    if (role === 'student') {
-      document.getElementById('loginTitle').textContent = 'Student Login';
-      document.getElementById('loginSubtitle').textContent = 'Sign in to submit your faculty evaluation.';
-      document.getElementById('usernameInput').placeholder = 'e.g. student';
-    } else {
-      document.getElementById('loginTitle').textContent = 'Faculty / Admin Login';
-      document.getElementById('loginSubtitle').textContent = 'Sign in to view evaluation results and analytics.';
-      document.getElementById('usernameInput').placeholder = 'e.g. admin';
-    }
+    const titles = {
+      student: ['Student Login', 'Sign in to submit your faculty evaluation.', 'e.g. student'],
+      teacher: ['Teacher Login', 'Sign in to view your personal feedback and analytics.', 'e.g. acruz, mlim, rsantos...'],
+      admin:   ['Admin Login', 'Sign in to access the full evaluation dashboard.', 'e.g. admin'],
+    };
+
+    const [title, subtitle, placeholder] = titles[role];
+    document.getElementById('loginTitle').textContent = title;
+    document.getElementById('loginSubtitle').textContent = subtitle;
+    document.getElementById('usernameInput').placeholder = placeholder;
   }
 </script>
 </body>

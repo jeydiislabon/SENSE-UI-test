@@ -9,9 +9,19 @@ app.secret_key = "sense-secret-key-change-in-production"
 # FIXED CREDENTIALS — replace with DB lookup after Jamie's backend merges
 # ---------------------------------------------------------------------------
 USERS = {
-    "student":  {"password": "student123", "role": "student"},
-    "admin":    {"password": "admin123",   "role": "admin"},
-    "faculty":  {"password": "faculty123", "role": "admin"},
+    # Student
+    "student":    {"password": "student123",  "role": "student",  "faculty_id": None},
+    # Admin
+    "admin":      {"password": "admin123",    "role": "admin",    "faculty_id": None},
+    # Teachers — each tied to their faculty profile
+    "acruz":      {"password": "teacher123",  "role": "teacher",  "faculty_id": 1},
+    "mlim":       {"password": "teacher123",  "role": "teacher",  "faculty_id": 2},
+    "rsantos":    {"password": "teacher123",  "role": "teacher",  "faculty_id": 3},
+    "jdelarosa":  {"password": "teacher123",  "role": "teacher",  "faculty_id": 4},
+    "ctorres":    {"password": "teacher123",  "role": "teacher",  "faculty_id": 5},
+    "bvillanueva":{"password": "teacher123",  "role": "teacher",  "faculty_id": 6},
+    "agomez":     {"password": "teacher123",  "role": "teacher",  "faculty_id": 7},
+    "ereyes":     {"password": "teacher123",  "role": "teacher",  "faculty_id": 8},
 }
 
 # ---------------------------------------------------------------------------
@@ -25,7 +35,9 @@ def login_required(role=None):
             if not session.get("logged_in"):
                 return redirect(url_for("login"))
             if role and session.get("role") != role:
-                return redirect(url_for("login"))
+                # Allow admin to access teacher routes too
+                if not (role == "teacher" and session.get("role") == "admin"):
+                    return redirect(url_for("login"))
             return f(*args, **kwargs)
         return decorated
     return decorator
@@ -309,6 +321,8 @@ def index():
     if session.get("logged_in"):
         if session.get("role") == "student":
             return redirect(url_for("student_dashboard"))
+        elif session.get("role") == "teacher":
+            return redirect(url_for("teacher_dashboard"))
         else:
             return redirect(url_for("admin_dashboard"))
     return redirect(url_for("login"))
@@ -325,8 +339,11 @@ def login():
             session["logged_in"] = True
             session["username"] = username
             session["role"] = user["role"]
+            session["faculty_id"] = user.get("faculty_id")
             if user["role"] == "student":
                 return redirect(url_for("student_dashboard"))
+            elif user["role"] == "teacher":
+                return redirect(url_for("teacher_dashboard"))
             else:
                 return redirect(url_for("admin_dashboard"))
         else:
@@ -406,6 +423,28 @@ def submit_evaluation(faculty_id):
         "label": label,
         "message": "Thank you for completing this semester's evaluation. Your feedback has been recorded."
     })
+
+
+# ---- TEACHER ROUTES ----
+
+@app.route("/teacher/dashboard")
+@login_required(role="teacher")
+def teacher_dashboard():
+    faculty_id = session.get("faculty_id")
+    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
+    if not member:
+        return redirect(url_for("logout"))
+
+    # Get this teacher's noise entries
+    my_noise = [n for n in NOISE_LOG if n["faculty"] == member["name"]]
+    tagalog_count  = sum(1 for n in my_noise if n["type"] == "tagalog")
+    gibberish_count = sum(1 for n in my_noise if n["type"] != "tagalog")
+
+    return render_template("teacher_dashboard.html",
+                           member=member,
+                           my_noise=my_noise,
+                           tagalog_count=tagalog_count,
+                           gibberish_count=gibberish_count)
 
 
 # ---- ADMIN ROUTES ----
