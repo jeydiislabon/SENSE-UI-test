@@ -286,8 +286,41 @@ STATS = {
 }
 
 # ---------------------------------------------------------------------------
-# NOISE DETECTION (Obj 1.1) — frontend-side validation
+# BASIC SENTIMENT CLASSIFIER (placeholder until RoBERTa is integrated)
 # ---------------------------------------------------------------------------
+POSITIVE_WORDS = {
+    "good","great","excellent","amazing","outstanding","wonderful","fantastic",
+    "helpful","clear","organized","patient","approachable","knowledgeable",
+    "effective","engaging","inspiring","best","loved","enjoy","enjoyed",
+    "like","liked","appreciate","appreciated","thank","thanks","awesome",
+    "brilliant","thorough","dedicated","prepared","responsive","fair",
+    "informative","interesting","consistent","structured","well","nice",
+    "perfect","superb","talented","passionate","caring","kind","friendly",
+    "positive","recommend","happy","satisfied","love","impressive","solid",
+}
+
+NEGATIVE_WORDS = {
+    "bad","poor","terrible","awful","boring","confusing","difficult","hard",
+    "unclear","disorganized","slow","late","unfair","harsh","strict","rude",
+    "unhelpful","disappointing","frustrated","frustrating","annoying","worst",
+    "hate","hated","dislike","disliked","missed","absent","unresponsive",
+    "unclear","complicated","rushed","behind","delayed","wrong","incorrect",
+    "irrelevant","useless","waste","failed","fail","negative","problem",
+    "issue","concerned","concern","improve","improvement","better","fix",
+    "lacking","insufficient","not","never","barely","hardly","too","very hard",
+}
+
+def simple_sentiment(text):
+    """Basic keyword-based sentiment. Replace with RoBERTa when available."""
+    words = re.findall(r'\b\w+\b', text.lower())
+    pos = sum(1 for w in words if w in POSITIVE_WORDS)
+    neg = sum(1 for w in words if w in NEGATIVE_WORDS)
+    if pos > neg:
+        return "Positive"
+    elif neg > pos:
+        return "Negative"
+    else:
+        return "Neutral"
 
 # Common Tagalog words/markers
 TAGALOG_WORDS = {
@@ -315,29 +348,38 @@ def detect_noise(text):
     """
     t = text.strip()
 
-    # Too short
-    if len(t) < 5:
+    # Too short (less than 8 chars or 2 words)
+    if len(t) < 8:
+        return {"is_noise": True, "reason": "Response is too short", "type": "too_short"}
+
+    words = re.findall(r'\b\w+\b', t.lower())
+    if len(words) < 2:
         return {"is_noise": True, "reason": "Response is too short", "type": "too_short"}
 
     # Numbers / symbols only
     if re.match(r'^[\d\s\W]+$', t):
         return {"is_noise": True, "reason": "Numbers or symbols only", "type": "gibberish"}
 
-    # Repeated characters (e.g. aaaaaaa, lkjhgfds)
+    # Repeated characters (e.g. aaaaaaa)
     if re.match(r'^(.)\1{4,}$', t):
         return {"is_noise": True, "reason": "Repeated characters", "type": "gibberish"}
 
-    # No vowels at all (keyboard spam)
+    # No vowels at all (keyboard spam like asdfghjkl)
     letters = re.sub(r'[^a-zA-Z]', '', t)
     if len(letters) > 4:
         vowels = re.sub(r'[^aeiouAEIOU]', '', letters)
-        if len(vowels) == 0:
+        ratio = len(vowels) / len(letters)
+        if ratio < 0.1:
             return {"is_noise": True, "reason": "Keyboard pattern detected", "type": "gibberish"}
 
+    # Very high consonant cluster (qwerty spam)
+    consonant_clusters = re.findall(r'[^aeiou\s\d\W]{5,}', t.lower())
+    if consonant_clusters:
+        return {"is_noise": True, "reason": "Keyboard pattern detected", "type": "gibberish"}
+
     # Tagalog detection
-    words = re.findall(r'\b\w+\b', t.lower())
     tagalog_hits = [w for w in words if w in TAGALOG_WORDS]
-    if len(tagalog_hits) >= 2 or (len(tagalog_hits) >= 1 and len(words) <= 4):
+    if len(tagalog_hits) >= 2 or (len(tagalog_hits) >= 1 and len(words) <= 5):
         return {"is_noise": True, "reason": f"Tagalog detected: {', '.join(tagalog_hits)}", "type": "tagalog"}
 
     return {"is_noise": False, "reason": "", "type": "clean"}
@@ -453,8 +495,7 @@ def submit_evaluation(faculty_id):
             })
 
     # Valid — store in file
-    import random
-    label = random.choice(["Positive", "Neutral", "Negative"])
+    label = simple_sentiment(text)
     member = next((f for f in FACULTY if f["id"] == faculty_id), None)
     if member:
         data = load_data()
@@ -486,13 +527,16 @@ def teacher_dashboard():
 
     stored = load_data()
     combined_noise = NOISE_LOG + stored["noise_log"]
+    combined_valid = VALID_SUBMISSIONS + stored["valid_submissions"]
     my_noise = [n for n in combined_noise if n["faculty"] == member["name"]]
+    my_valid = [v for v in combined_valid if v["faculty"] == member["name"]]
     tagalog_count  = sum(1 for n in my_noise if n["type"] == "tagalog")
     gibberish_count = sum(1 for n in my_noise if n["type"] != "tagalog")
 
     return render_template("teacher_dashboard.html",
                            member=member,
                            my_noise=my_noise,
+                           my_valid=my_valid,
                            tagalog_count=tagalog_count,
                            gibberish_count=gibberish_count)
 

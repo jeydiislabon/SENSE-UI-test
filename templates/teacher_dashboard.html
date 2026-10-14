@@ -339,7 +339,7 @@
         </div>
         <div class="teacher-stats">
           <div class="teacher-stat">
-            <div class="teacher-stat-num">{{ member.comments | length }}</div>
+            <div class="teacher-stat-num">{{ (member.comments | length) + (my_valid | length) }}</div>
             <div class="teacher-stat-label">Comments</div>
           </div>
           <div class="teacher-stat-divider"></div>
@@ -394,6 +394,18 @@
           </div>
 
           <div id="commentsList">
+            {% for c in my_valid %}
+            <div class="comment-entry" data-label="{{ c.label }}">
+              <div class="comment-entry-header">
+                <span class="comment-entry-anon">Anonymous student</span>
+                <span class="badge {{ c.label | lower }}">{{ c.label }}</span>
+                {% if c.rating is defined %}
+                <span style="font-size:11px; color:var(--text-muted);">Rating: {{ c.rating }}/5</span>
+                {% endif %}
+              </div>
+              <div class="comment-entry-text">{{ c.text }}</div>
+            </div>
+            {% endfor %}
             {% for c in member.comments %}
             <div class="comment-entry" data-label="{{ c.label }}">
               <div class="comment-entry-header">
