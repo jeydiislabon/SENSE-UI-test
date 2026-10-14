@@ -48,7 +48,7 @@
       background: #1A1A1A;
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
+      color: #FFD100;
     }
 
     .login-left-logo-name { font-size: 20px; font-weight: 900; color: #1A1A1A; }
@@ -89,9 +89,9 @@
     .role-card:hover { background: rgba(0,0,0,0.14); }
     .role-card.selected { background: #1A1A1A; border-color: #1A1A1A; }
     .role-card.selected .role-label { color: #FFD100; }
-    .role-card.selected .role-icon  { filter: none; }
+    .role-card.selected .role-icon  { color: #FFD100; }
 
-    .role-icon  { font-size: 28px; margin-bottom: 6px; display: block; }
+    .role-icon  { display: flex; justify-content: center; margin-bottom: 8px; color: #1A1A1A; }
     .role-label { font-size: 13px; font-weight: 700; color: #1A1A1A; }
 
     /* Right panel */
@@ -180,7 +180,11 @@
     <!-- Left -->
     <div class="login-left">
       <div class="login-left-logo">
-        <div class="login-left-logo-box">💬</div>
+        <div class="login-left-logo-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#FFD100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div>
           <div class="login-left-logo-name">Sense</div>
           <div class="login-left-logo-sub">Student Portal — TIP</div>
@@ -193,11 +197,22 @@
       <!-- Role selector -->
       <div class="role-cards">
         <div class="role-card selected" id="roleStudent" onclick="selectRole('student')">
-          <span class="role-icon">👩‍🎓</span>
+          <span class="role-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
           <span class="role-label">Student</span>
         </div>
         <div class="role-card" id="roleAdmin" onclick="selectRole('admin')">
-          <span class="role-icon">👩‍🏫</span>
+          <span class="role-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M17 3l1.5 1.5L21 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <span class="role-label">Faculty / Admin</span>
         </div>
       </div>
