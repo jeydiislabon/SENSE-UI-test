@@ -38,7 +38,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "rvalenzuela@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 65, "neutral": 20, "negative": 15},
         "summary": (
@@ -60,7 +60,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "njlusung@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 58, "neutral": 28, "negative": 14},
         "summary": (
@@ -82,7 +82,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "lapornobi@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 72, "neutral": 18, "negative": 10},
         "summary": (
@@ -103,7 +103,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "jhgang@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 60, "neutral": 25, "negative": 15},
         "summary": (
@@ -124,7 +124,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "mrosales@university.edu",
         "location": "CpE Department",
-        "color": "#E84393",
+        "color": "#A7A11D",
         "accepting": True,
         "sentiment": {"positive": 70, "neutral": 20, "negative": 10},
         "summary": (
@@ -145,7 +145,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "jquejado@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 55, "neutral": 30, "negative": 15},
         "summary": (
@@ -166,7 +166,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "vnojor@university.edu",
         "location": "CpE Department",
-        "color": "#6C5CE7",
+        "color": "#544E12",
         "accepting": True,
         "sentiment": {"positive": 62, "neutral": 22, "negative": 16},
         "summary": (
@@ -187,7 +187,7 @@ FACULTY = [
         "role": "CpE Faculty",
         "email": "lbalaya@university.edu",
         "location": "CpE Department",
-        "color": "#E84393",
+        "color": "#A7A11D",
         "accepting": True,
         "sentiment": {"positive": 68, "neutral": 22, "negative": 10},
         "summary": (
@@ -215,10 +215,10 @@ NOISE_LOG = [
 ]
 
 LATEST_COMMENTS = [
-    {"initials": "RV", "color": "#6C5CE7", "name": "Engr. Robin Valenzuela",    "label": "Positive", "text": "Explains concepts clearly and always makes time for questions after class."},
-    {"initials": "NL", "color": "#6C5CE7", "name": "Engr. Noel Jason Lusung",   "label": "Neutral",  "text": "The lessons are organized, but the project deadlines sometimes feel too close together."},
-    {"initials": "MR", "color": "#E84393", "name": "Engr. Menchie Rosales",     "label": "Positive", "text": "Best class of the semester. Makes every topic feel relevant and interesting."},
-    {"initials": "LP", "color": "#6C5CE7", "name": "Engr. Lloyd Aldrin Pornobi","label": "Negative", "text": "Laboratory instructions could be posted earlier so we have more time to prepare."},
+    {"initials": "RV", "color": "#544E12", "name": "Engr. Robin Valenzuela",    "label": "Positive", "text": "Explains concepts clearly and always makes time for questions after class."},
+    {"initials": "NL", "color": "#544E12", "name": "Engr. Noel Jason Lusung",   "label": "Neutral",  "text": "The lessons are organized, but the project deadlines sometimes feel too close together."},
+    {"initials": "MR", "color": "#A7A11D", "name": "Engr. Menchie Rosales",     "label": "Positive", "text": "Best class of the semester. Makes every topic feel relevant and interesting."},
+    {"initials": "LP", "color": "#544E12", "name": "Engr. Lloyd Aldrin Pornobi","label": "Negative", "text": "Laboratory instructions could be posted earlier so we have more time to prepare."},
 ]
 
 STATS = {
