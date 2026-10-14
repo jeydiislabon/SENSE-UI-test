@@ -33,12 +33,12 @@ def login_required(f):
 FACULTY = [
     {
         "id": 1,
-        "initials": "RV",
-        "name": "Engr. Robin Valenzuela",
+        "initials": "AC",
+        "name": "Engr. Adrian Cruz",
         "role": "CpE Faculty",
-        "email": "rvalenzuela@university.edu",
+        "email": "acruz@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 65, "neutral": 20, "negative": 15},
         "summary": (
@@ -55,12 +55,12 @@ FACULTY = [
     },
     {
         "id": 2,
-        "initials": "NL",
-        "name": "Engr. Noel Jason Lusung",
+        "initials": "ML",
+        "name": "Engr. Maria Lim",
         "role": "CpE Faculty",
-        "email": "njlusung@university.edu",
+        "email": "mlim@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 58, "neutral": 28, "negative": 14},
         "summary": (
@@ -77,12 +77,12 @@ FACULTY = [
     },
     {
         "id": 3,
-        "initials": "LP",
-        "name": "Engr. Lloyd Aldrin Pornobi",
+        "initials": "RS",
+        "name": "Engr. Ramon Santos",
         "role": "CpE Faculty",
-        "email": "lapornobi@university.edu",
+        "email": "rsantos@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 72, "neutral": 18, "negative": 10},
         "summary": (
@@ -98,12 +98,12 @@ FACULTY = [
     },
     {
         "id": 4,
-        "initials": "JG",
-        "name": "Engr. Ji Han Gang",
+        "initials": "JD",
+        "name": "Engr. Jose Dela Rosa",
         "role": "CpE Faculty",
-        "email": "jhgang@university.edu",
+        "email": "jdelarosa@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 60, "neutral": 25, "negative": 15},
         "summary": (
@@ -119,12 +119,12 @@ FACULTY = [
     },
     {
         "id": 5,
-        "initials": "MR",
-        "name": "Engr. Menchie Rosales",
+        "initials": "CT",
+        "name": "Engr. Clara Torres",
         "role": "CpE Faculty",
-        "email": "mrosales@university.edu",
+        "email": "ctorres@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#A7A11D",
+        "color": "#FFD100",
         "accepting": True,
         "sentiment": {"positive": 70, "neutral": 20, "negative": 10},
         "summary": (
@@ -140,12 +140,12 @@ FACULTY = [
     },
     {
         "id": 6,
-        "initials": "JQ",
-        "name": "Engr. Jimlord Quejado",
+        "initials": "BV",
+        "name": "Engr. Bernard Villanueva",
         "role": "CpE Faculty",
-        "email": "jquejado@university.edu",
+        "email": "bvillanueva@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 55, "neutral": 30, "negative": 15},
         "summary": (
@@ -161,12 +161,12 @@ FACULTY = [
     },
     {
         "id": 7,
-        "initials": "VN",
-        "name": "Engr. Verlyn Nojor",
+        "initials": "AG",
+        "name": "Engr. Angela Gomez",
         "role": "CpE Faculty",
-        "email": "vnojor@university.edu",
+        "email": "agomez@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#544E12",
+        "color": "#1A1A1A",
         "accepting": True,
         "sentiment": {"positive": 62, "neutral": 22, "negative": 16},
         "summary": (
@@ -182,12 +182,12 @@ FACULTY = [
     },
     {
         "id": 8,
-        "initials": "LB",
-        "name": "Engr. Leah Balaya",
+        "initials": "ER",
+        "name": "Engr. Eduardo Reyes",
         "role": "CpE Faculty",
-        "email": "lbalaya@university.edu",
+        "email": "ereyes@tip.edu.ph",
         "location": "CpE Department",
-        "color": "#A7A11D",
+        "color": "#FFD100",
         "accepting": True,
         "sentiment": {"positive": 68, "neutral": 22, "negative": 10},
         "summary": (
@@ -215,10 +215,10 @@ NOISE_LOG = [
 ]
 
 LATEST_COMMENTS = [
-    {"initials": "RV", "color": "#544E12", "name": "Engr. Robin Valenzuela",    "label": "Positive", "text": "Explains concepts clearly and always makes time for questions after class."},
-    {"initials": "NL", "color": "#544E12", "name": "Engr. Noel Jason Lusung",   "label": "Neutral",  "text": "The lessons are organized, but the project deadlines sometimes feel too close together."},
-    {"initials": "MR", "color": "#A7A11D", "name": "Engr. Menchie Rosales",     "label": "Positive", "text": "Best class of the semester. Makes every topic feel relevant and interesting."},
-    {"initials": "LP", "color": "#544E12", "name": "Engr. Lloyd Aldrin Pornobi","label": "Negative", "text": "Laboratory instructions could be posted earlier so we have more time to prepare."},
+    {"initials": "AC", "color": "#1A1A1A", "name": "Engr. Adrian Cruz",       "label": "Positive", "text": "Explains concepts clearly and always makes time for questions after class."},
+    {"initials": "ML", "color": "#1A1A1A", "name": "Engr. Maria Lim",         "label": "Neutral",  "text": "The lessons are organized, but the project deadlines sometimes feel too close together."},
+    {"initials": "CT", "color": "#FFD100", "name": "Engr. Clara Torres",      "label": "Positive", "text": "Best class of the semester. Makes every topic feel relevant and interesting."},
+    {"initials": "RS", "color": "#1A1A1A", "name": "Engr. Ramon Santos",      "label": "Negative", "text": "Laboratory instructions could be posted earlier so we have more time to prepare."},
 ]
 
 STATS = {
