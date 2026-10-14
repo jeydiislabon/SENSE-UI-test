@@ -242,6 +242,13 @@ NOISE_LOG = [
     {"faculty": "Engr. Maria Lim",        "text": "123456",        "reason": "Numbers only",           "type": "gibberish"},
 ]
 
+# Valid submissions received during this session
+VALID_SUBMISSIONS = [
+    {"faculty": "Engr. Adrian Cruz",  "initials": "AC", "color": "#1A1A1A", "text": "Explains concepts clearly and always makes time for questions after class.", "rating": 5},
+    {"faculty": "Engr. Maria Lim",    "initials": "ML", "color": "#1A1A1A", "text": "The lessons are organized but deadlines feel too close together.", "rating": 3},
+    {"faculty": "Engr. Clara Torres", "initials": "CT", "color": "#FFD100", "text": "Best class this semester. Very engaging and practical.", "rating": 5},
+]
+
 LATEST_COMMENTS = [
     {"initials": "AC", "color": "#1A1A1A", "name": "Engr. Adrian Cruz",       "label": "Positive", "text": "Explains concepts clearly and always makes time for questions after class."},
     {"initials": "ML", "color": "#1A1A1A", "name": "Engr. Maria Lim",         "label": "Neutral",  "text": "The lessons are organized, but the project deadlines sometimes feel too close together."},
@@ -422,9 +429,20 @@ def submit_evaluation(faculty_id):
                 "message": "Your response appears to be invalid. Please write a meaningful evaluation in English."
             })
 
-    # Valid — mock sentiment for now
+    # Valid — store in VALID_SUBMISSIONS
     import random
     label = random.choice(["Positive", "Neutral", "Negative"])
+    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
+    if member:
+        VALID_SUBMISSIONS.append({
+            "faculty":  member["name"],
+            "initials": member["initials"],
+            "color":    member["color"],
+            "text":     text,
+            "rating":   rating,
+            "label":    label,
+        })
+        STATS["total_feedback"] = 248 + len(VALID_SUBMISSIONS)
     return jsonify({
         "status": "success",
         "label": label,
@@ -467,6 +485,7 @@ def admin_dashboard():
                            stats=STATS,
                            latest_comments=LATEST_COMMENTS,
                            noise_log=NOISE_LOG,
+                           valid_submissions=VALID_SUBMISSIONS,
                            tagalog_count=tagalog_count,
                            gibberish_count=gibberish_count,
                            faculty=FACULTY)

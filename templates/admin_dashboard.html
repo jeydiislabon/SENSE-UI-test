@@ -249,6 +249,45 @@
         </div>
       </div>
 
+      <!-- Valid Feedback (submitted this session) -->
+      <div class="section-block">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Valid Feedback</div>
+            <div class="section-desc">Accepted English comments submitted through the student portal</div>
+          </div>
+          <span style="font-size:13px; color:var(--text-muted);">{{ valid_submissions | length }} submitted</span>
+        </div>
+
+        <div class="card">
+          {% if valid_submissions %}
+            {% for s in valid_submissions | reverse %}
+            <div class="comment-item">
+              <div class="avatar" style="background: {{ s.color }}; color: {{ '#1A1A1A' if s.color == '#FFD100' else '#fff' }}; width:36px; height:36px; font-size:12px; font-weight:700; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                {{ s.initials }}
+              </div>
+              <div class="comment-meta" style="flex:1;">
+                <div class="comment-name" style="font-size:13px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                  {{ s.faculty }}
+                  {% if s.label is defined %}
+                  <span class="badge {{ s.label | lower }}">{{ s.label }}</span>
+                  {% endif %}
+                  {% if s.rating is defined %}
+                  <span style="font-size:11px; color:var(--text-muted);">Rating: {{ s.rating }}/5</span>
+                  {% endif %}
+                </div>
+                <div class="comment-text" style="font-size:12px; color:var(--text-muted);">{{ s.text }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div style="text-align:center; padding:32px; color:var(--text-muted); font-size:13px;">
+              No valid feedback submitted yet this session.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
       <!-- Noise Filtration Report -->
       <div class="section-block">
         <div class="section-header">
