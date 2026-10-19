@@ -198,15 +198,6 @@
             </div>
             <div class="rating-label" id="ratingLabel">Click a star to rate</div>
 
-            <!-- English note -->
-            <div class="english-note">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              <span>Please write your feedback in <strong>English only</strong>. Tagalog responses will not be processed by the system.</span>
-            </div>
-
             <!-- Warnings -->
             <div class="lang-warning" id="langWarning">
               <span class="lang-warning-icon">
@@ -226,7 +217,7 @@
             <textarea
               class="feedback-textarea"
               id="feedbackText"
-              placeholder="What would you like to share about {{ member.name }}? (English only)"
+              placeholder="What would you like to share about {{ member.name }}?"
               maxlength="500"
               oninput="onTextInput()"
               {% if not member.accepting %}disabled{% endif %}
