@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — Sense</title>
+  <title>Program Chair Dashboard — Sense</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -152,7 +152,7 @@
 
     <div class="sidebar-section-label">Workspace</div>
     <nav class="sidebar-nav">
-      <a href="/admin/dashboard" class="nav-item active">
+      <a href="/programchair/dashboard" class="nav-item active">
         <span class="nav-icon">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
@@ -163,7 +163,7 @@
         </span>
         <span>Dashboard</span>
       </a>
-      <a href="/admin/advisors" class="nav-item">
+      <a href="/programchair/advisors" class="nav-item">
         <span class="nav-icon">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
@@ -178,7 +178,7 @@
 
     <div class="sidebar-footer">
       <div class="voice-card">
-        <h4>Admin Panel</h4>
+        <h4>Program Chair</h4>
         <p>Manage and review all faculty evaluation data.</p>
       </div>
       <a href="/logout" class="btn-exit">
@@ -207,9 +207,19 @@
     </header>
 
     <div class="page-body">
-      <p class="page-label">Admin Dashboard</p>
+      <p class="page-label">Program Chair Dashboard</p>
       <h1 class="page-title">Overview</h1>
-      <p class="page-subtitle">Evaluation results and analytics across all faculty. <a href="/admin/dashboard" style="color:var(--yellow); font-weight:700; font-size:12px;">↻ Refresh</a></p>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+        <p class="page-subtitle" style="margin-bottom:0;">Evaluation results and analytics across all faculty. <a href="/programchair/dashboard" style="color:var(--yellow); font-weight:700; font-size:12px;">↻ Refresh</a></p>
+        <button onclick="downloadPDF()" style="display:flex; align-items:center; gap:8px; background:#1A1A1A; color:#FFD100; border:none; padding:10px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Download Summary Report (PDF)
+        </button>
+      </div>
 
       <!-- Stats row -->
       <div class="stats-row">
@@ -418,9 +428,32 @@
 
   document.getElementById('globalSearch').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && this.value.trim()) {
-      window.location.href = '/admin/advisors?q=' + encodeURIComponent(this.value.trim());
+      window.location.href = '/programchair/advisors?q=' + encodeURIComponent(this.value.trim());
     }
   });
+
+  function downloadPDF() {
+    document.body.classList.add('printing');
+    window.print();
+    document.body.classList.remove('printing');
+  }
 </script>
+
+<style>
+  @media print {
+    .sidebar, .topbar, .filter-tabs, button, .pending-card { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .page-body { padding: 16px !important; }
+    body { background: #fff !important; }
+    .stat-card { background: #f5f5f5 !important; break-inside: avoid; }
+    .stat-number { color: #1A1A1A !important; }
+    .stat-label  { color: #555 !important; }
+    .noise-table th { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card { box-shadow: none !important; border: 1px solid #ddd; break-inside: avoid; margin-bottom: 16px; }
+    .section-title { color: #1A1A1A !important; }
+    .noise-type-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
 </body>
 </html>

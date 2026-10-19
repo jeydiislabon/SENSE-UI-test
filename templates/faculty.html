@@ -22,7 +22,7 @@
 
     <div class="sidebar-section-label">Workspace</div>
     <nav class="sidebar-nav">
-      <a href="/admin/dashboard" class="nav-item">
+      <a href="/programchair/dashboard" class="nav-item">
         <span class="nav-icon">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
@@ -32,7 +32,7 @@
           </svg>
         </span> <span>Dashboard</span>
       </a>
-      <a href="/admin/advisors" class="nav-item active">
+      <a href="/programchair/advisors" class="nav-item active">
         <span class="nav-icon">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="2"/>
@@ -71,7 +71,7 @@
 
     <div class="page-body">
 
-      <a href="/admin/advisors" class="back-link">← Back to advisors</a>
+      <a href="/programchair/advisors" class="back-link">← Back to advisors</a>
 
       <!-- Profile Card -->
       <div class="faculty-profile-card">
@@ -230,7 +230,7 @@
   // Global search
   document.getElementById('globalSearch').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && this.value.trim()) {
-      window.location.href = '/admin/advisors?q=' + encodeURIComponent(this.value.trim());
+      window.location.href = '/programchair/advisors?q=' + encodeURIComponent(this.value.trim());
     }
   });
 

@@ -32,19 +32,10 @@ def save_data(data):
 # FIXED CREDENTIALS — replace with DB lookup after Jamie's backend merges
 # ---------------------------------------------------------------------------
 USERS = {
-    # Student
-    "student":    {"password": "student123",  "role": "student",  "faculty_id": None},
-    # Admin
-    "admin":      {"password": "admin123",    "role": "admin",    "faculty_id": None},
-    # Teachers — each tied to their faculty profile
-    "acruz":      {"password": "teacher123",  "role": "teacher",  "faculty_id": 1},
-    "mlim":       {"password": "teacher123",  "role": "teacher",  "faculty_id": 2},
-    "rsantos":    {"password": "teacher123",  "role": "teacher",  "faculty_id": 3},
-    "jdelarosa":  {"password": "teacher123",  "role": "teacher",  "faculty_id": 4},
-    "ctorres":    {"password": "teacher123",  "role": "teacher",  "faculty_id": 5},
-    "bvillanueva":{"password": "teacher123",  "role": "teacher",  "faculty_id": 6},
-    "agomez":     {"password": "teacher123",  "role": "teacher",  "faculty_id": 7},
-    "ereyes":     {"password": "teacher123",  "role": "teacher",  "faculty_id": 8},
+    # Students
+    "student":    {"password": "student123",  "role": "student"},
+    # Program Chair
+    "programchair": {"password": "chair123",  "role": "programchair"},
 }
 
 # ---------------------------------------------------------------------------
@@ -58,9 +49,7 @@ def login_required(role=None):
             if not session.get("logged_in"):
                 return redirect(url_for("login"))
             if role and session.get("role") != role:
-                # Allow admin to access teacher routes too
-                if not (role == "teacher" and session.get("role") == "admin"):
-                    return redirect(url_for("login"))
+                return redirect(url_for("login"))
             return f(*args, **kwargs)
         return decorated
     return decorator
@@ -393,10 +382,8 @@ def index():
     if session.get("logged_in"):
         if session.get("role") == "student":
             return redirect(url_for("student_dashboard"))
-        elif session.get("role") == "teacher":
-            return redirect(url_for("teacher_dashboard"))
         else:
-            return redirect(url_for("admin_dashboard"))
+            return redirect(url_for("programchair_dashboard"))
     return redirect(url_for("login"))
 
 
@@ -410,21 +397,13 @@ def login():
         user = USERS.get(username)
 
         if user and user["password"] == password:
-            # Block if selected role doesn't match account role
-            if user["role"] != selected_role:
-                role_labels = {"student": "Student", "teacher": "Teacher", "admin": "Admin"}
-                error = f"This account is not a {role_labels.get(selected_role, selected_role)} account. Please select the correct role."
+            session["logged_in"] = True
+            session["username"] = username
+            session["role"] = user["role"]
+            if user["role"] == "student":
+                return redirect(url_for("student_dashboard"))
             else:
-                session["logged_in"] = True
-                session["username"] = username
-                session["role"] = user["role"]
-                session["faculty_id"] = user.get("faculty_id")
-                if user["role"] == "student":
-                    return redirect(url_for("student_dashboard"))
-                elif user["role"] == "teacher":
-                    return redirect(url_for("teacher_dashboard"))
-                else:
-                    return redirect(url_for("admin_dashboard"))
+                return redirect(url_for("programchair_dashboard"))
         else:
             error = "Invalid username or password."
     return render_template("login.html", error=error)
@@ -515,37 +494,11 @@ def submit_evaluation(faculty_id):
     })
 
 
-# ---- TEACHER ROUTES ----
+# ---- PROGRAM CHAIR ROUTES ----
 
-@app.route("/teacher/dashboard")
-@login_required(role="teacher")
-def teacher_dashboard():
-    faculty_id = session.get("faculty_id")
-    member = next((f for f in FACULTY if f["id"] == faculty_id), None)
-    if not member:
-        return redirect(url_for("logout"))
-
-    stored = load_data()
-    combined_noise = NOISE_LOG + stored["noise_log"]
-    combined_valid = VALID_SUBMISSIONS + stored["valid_submissions"]
-    my_noise = [n for n in combined_noise if n["faculty"] == member["name"]]
-    my_valid = [v for v in combined_valid if v["faculty"] == member["name"]]
-    tagalog_count  = sum(1 for n in my_noise if n["type"] == "tagalog")
-    gibberish_count = sum(1 for n in my_noise if n["type"] != "tagalog")
-
-    return render_template("teacher_dashboard.html",
-                           member=member,
-                           my_noise=my_noise,
-                           my_valid=my_valid,
-                           tagalog_count=tagalog_count,
-                           gibberish_count=gibberish_count)
-
-
-# ---- ADMIN ROUTES ----
-
-@app.route("/admin/dashboard")
-@login_required(role="admin")
-def admin_dashboard():
+@app.route("/programchair/dashboard")
+@login_required(role="programchair")
+def programchair_dashboard():
     stored = load_data()
     combined_noise = NOISE_LOG + stored["noise_log"]
     combined_valid = VALID_SUBMISSIONS + stored["valid_submissions"]
@@ -569,18 +522,24 @@ def admin_dashboard():
                            faculty=FACULTY)
 
 
-@app.route("/admin/faculty/<int:faculty_id>")
-@login_required(role="admin")
-def admin_faculty(faculty_id):
+@app.route("/programchair/faculty/<int:faculty_id>")
+@login_required(role="programchair")
+def programchair_faculty(faculty_id):
     member = next((f for f in FACULTY if f["id"] == faculty_id), None)
     if not member:
-        return redirect(url_for("admin_dashboard"))
-    faculty_noise = [n for n in NOISE_LOG if n["faculty"] == member["name"]]
-    return render_template("faculty.html", member=member, faculty_noise=faculty_noise)
+        return redirect(url_for("programchair_dashboard"))
+    stored = load_data()
+    combined_noise = NOISE_LOG + stored["noise_log"]
+    combined_valid = VALID_SUBMISSIONS + stored["valid_submissions"]
+    faculty_noise = [n for n in combined_noise if n["faculty"] == member["name"]]
+    faculty_valid = [v for v in combined_valid if v["faculty"] == member["name"]]
+    return render_template("faculty.html", member=member,
+                           faculty_noise=faculty_noise,
+                           faculty_valid=faculty_valid)
 
 
-@app.route("/admin/advisors")
-@login_required(role="admin")
+@app.route("/programchair/advisors")
+@login_required(role="programchair")
 def advisors():
     query = request.args.get("q", "").lower()
     results = [f for f in FACULTY if query in f["name"].lower()] if query else FACULTY
