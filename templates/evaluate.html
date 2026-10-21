@@ -7,95 +7,188 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
-    .eval-wrap {
-      max-width: 680px;
-      margin: 0 auto;
-    }
+    .eval-wrap { max-width: 860px; margin: 0 auto; }
 
-    /* Star rating */
-    .star-rating {
-      display: flex;
-      gap: 8px;
-      margin: 16px 0 24px;
-    }
-
-    .star {
-      font-size: 36px;
-      cursor: pointer;
-      color: #D0D0D0;
-      transition: color 0.15s, transform 0.1s;
-      user-select: none;
-    }
-    .star:hover, .star.active { color: #FFD100; transform: scale(1.1); }
-
-    .rating-label {
-      font-size: 14px;
-      color: var(--text-muted);
+    .eval-form-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
       margin-bottom: 20px;
-      min-height: 20px;
-      font-weight: 500;
     }
 
-    /* Language warning */
+    /* Category block */
+    .eval-category {
+      margin-bottom: 32px;
+    }
+
+    .eval-category-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1A1A1A;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eval-category-num {
+      background: #1A1A1A;
+      color: #FFD100;
+      font-size: 11px;
+      font-weight: 900;
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .eval-category-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-left: 34px;
+      line-height: 1.5;
+    }
+
+    /* Likert table */
+    .likert-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .likert-table thead th {
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .likert-table thead th:first-child { text-align: left; }
+
+    .likert-table tbody tr:hover { background: #FAFAFA; }
+
+    .likert-table tbody td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .likert-table tbody tr:last-child td { border-bottom: none; }
+
+    .subcategory-name {
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    .subcategory-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .likert-table td.radio-cell {
+      text-align: center;
+      vertical-align: middle;
+      width: 52px;
+    }
+
+    /* Custom radio */
+    .likert-radio {
+      appearance: none;
+      width: 18px; height: 18px;
+      border: 2px solid #D0D0D0;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .likert-radio:checked {
+      background: #1A1A1A;
+      border-color: #1A1A1A;
+      box-shadow: inset 0 0 0 3px #fff;
+    }
+    .likert-radio:hover { border-color: #FFD100; }
+
+    /* Likert scale header labels */
+    .scale-header {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0;
+      margin-bottom: 8px;
+      padding-right: 0;
+    }
+
+    /* Open feedback */
+    .open-feedback-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    /* Warnings */
     .lang-warning {
       display: none;
       background: #FFF3CD;
       border: 1.5px solid #FFD100;
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 12px 16px;
       font-size: 13px;
       color: #7A5C00;
       margin-bottom: 16px;
-      line-height: 1.5;
+      align-items: center;
+      gap: 10px;
     }
-    .lang-warning.show { display: flex; gap: 10px; align-items: flex-start; }
-    .lang-warning-icon { font-size: 18px; flex-shrink: 0; }
+    .lang-warning.show { display: flex; }
 
     .noise-warning {
       display: none;
       background: #FFE8E3;
       border: 1.5px solid #E74C3C;
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 12px 16px;
       font-size: 13px;
       color: #922B21;
       margin-bottom: 16px;
-      line-height: 1.5;
+      align-items: center;
+      gap: 10px;
     }
-    .noise-warning.show { display: flex; gap: 10px; align-items: flex-start; }
+    .noise-warning.show { display: flex; }
 
-    /* Char counter */
-    .char-counter {
-      text-align: right;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* Thank you screen */
+    /* Thank you */
     .thankyou-screen {
       display: none;
       text-align: center;
       padding: 60px 20px;
     }
     .thankyou-screen.show { display: block; }
-    .thankyou-icon { font-size: 64px; margin-bottom: 20px; }
+    .thankyou-icon  { font-size: 56px; margin-bottom: 20px; }
     .thankyou-title { font-size: 26px; font-weight: 900; color: #1A1A1A; margin-bottom: 12px; }
     .thankyou-text  { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
 
-    .eval-form-card { background: var(--card-bg); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
+    .char-counter { text-align: right; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-    .english-note {
-      background: #F2F2F2;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 16px;
+    /* Scale legend */
+    .scale-legend {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 12px 16px;
+      background: #F9F9F9;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
     }
+    .scale-legend span { font-weight: 700; color: #1A1A1A; }
   </style>
 </head>
 <body>
@@ -113,7 +206,15 @@
     <div class="sidebar-section-label">Student</div>
     <nav class="sidebar-nav">
       <a href="/student/dashboard" class="nav-item active">
-        <span class="nav-icon">⊞</span> <span>My Evaluations</span>
+        <span class="nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>My Evaluations</span>
       </a>
     </nav>
 
@@ -132,7 +233,12 @@
   <div class="main-content">
     <header class="topbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/>
+            <path d="m21 21-4.35-4.35" stroke="#999" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
         <input type="text" placeholder="Search faculty..." />
       </div>
     </header>
@@ -151,8 +257,8 @@
             <div class="faculty-profile-name">{{ member.name }}</div>
             <div class="faculty-profile-role">{{ member.role }}</div>
             <div class="faculty-profile-meta">
-              <span>📚 {{ member.subject }}</span>
-              <span>📍 {{ member.location }}</span>
+              <span>{{ member.subject }}</span>
+              <span>{{ member.location }}</span>
             </div>
           </div>
           {% if member.accepting %}
@@ -165,7 +271,7 @@
 
       <div class="eval-wrap">
 
-        <!-- Thank you screen (hidden until submit) -->
+        <!-- Thank you screen -->
         <div class="thankyou-screen card" id="thankyouScreen">
           <div class="thankyou-icon">✅</div>
           <div class="thankyou-title">Thank you for your feedback!</div>
@@ -174,46 +280,328 @@
             for this semester. Your response is anonymous and will be used to help improve
             the quality of education at TIP.
           </div>
-          <a href="/student/dashboard" class="btn-submit" style="display:inline-block; width:auto; padding: 12px 32px; text-decoration:none;">
+          <a href="/student/dashboard" class="btn-submit" style="display:inline-block; width:auto; padding:12px 32px; text-decoration:none;">
             Back to Evaluations
           </a>
         </div>
 
-        <!-- Evaluation form -->
+        <!-- Evaluation Form -->
         <div id="evalForm">
-          <div class="eval-form-card">
-            <h2 style="font-size:18px; font-weight:800; margin-bottom:4px;">Faculty Evaluation</h2>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">
-              Your response is anonymous. Please be specific and constructive.
-            </p>
 
-            <!-- Star rating -->
-            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Overall Rating</div>
-            <div class="star-rating" id="starRating">
-              <span class="star" data-val="1">★</span>
-              <span class="star" data-val="2">★</span>
-              <span class="star" data-val="3">★</span>
-              <span class="star" data-val="4">★</span>
-              <span class="star" data-val="5">★</span>
+          <!-- Instructions -->
+          <div class="eval-form-card" style="padding:20px 32px;">
+            <div style="font-size:15px; font-weight:800; margin-bottom:8px;">Faculty Evaluation Form</div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Your response is anonymous. Read each item and mark how strongly you agree it reflects your teacher's practice.</p>
+            <div class="scale-legend">
+              <div><span>5</span> — Strongly Agree</div>
+              <div><span>4</span> — Agree</div>
+              <div><span>3</span> — Neutral</div>
+              <div><span>2</span> — Disagree</div>
+              <div><span>1</span> — Strongly Disagree</div>
             </div>
-            <div class="rating-label" id="ratingLabel">Click a star to rate</div>
+          </div>
 
-            <!-- Warnings -->
+          <!-- Category 1: Teaching Methods -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">1</span>
+                Teaching Methods
+              </div>
+              <div class="eval-category-desc">How the teacher delivers lessons, explains concepts, and helps students understand ideas.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat1 = [
+                    ("tm_clarity", "Lesson clarity", "The teacher explains ideas using language students can understand and clarifies unfamiliar terms."),
+                    ("tm_organization", "Lesson organization", "The teacher presents topics in a logical sequence with connections between lessons."),
+                    ("tm_examples", "Practical examples", "The teacher uses relevant examples to connect abstract ideas with familiar situations."),
+                    ("tm_activities", "Teaching activities", "The teacher selects activities that allow students to practice the skills covered in class."),
+                    ("tm_pacing", "Lesson pacing", "The teacher allows sufficient time for explanation and practice before moving forward.")
+                  ] %}
+                  {% for name, label, desc in cat1 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 2: Subject Knowledge -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">2</span>
+                Subject Knowledge and Preparation
+              </div>
+              <div class="eval-category-desc">The teacher's command of the subject and readiness to teach.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat2 = [
+                    ("sk_accuracy", "Content accuracy", "The teacher presents information accurately and uses subject terms appropriately."),
+                    ("sk_depth", "Depth of explanation", "The teacher explains why an idea works instead of only giving facts to memorize."),
+                    ("sk_preparation", "Lesson preparation", "The teacher comes to class with the materials and activities needed for the lesson."),
+                    ("sk_objectives", "Learning objectives", "The teacher explains what students are expected to learn from the lesson."),
+                    ("sk_questions", "Answering questions", "The teacher addresses subject-related questions with explanations that respond to the student's concern.")
+                  ] %}
+                  {% for name, label, desc in cat2 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 3: Values and Professional Conduct -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">3</span>
+                Values and Professional Conduct
+              </div>
+              <div class="eval-category-desc">Values demonstrated through the teacher's everyday behavior — respectful interactions, fair treatment, and responsibility.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat3 = [
+                    ("vpc_respect", "Respect", "The teacher communicates with students politely and protects their dignity during classroom interactions."),
+                    ("vpc_fair", "Fair treatment", "The teacher gives students fair consideration regardless of background or personal characteristics."),
+                    ("vpc_patience", "Patience", "The teacher responds calmly when students need repeated explanations or make mistakes."),
+                    ("vpc_responsibility", "Responsibility", "The teacher follows through on announced academic commitments and handles class responsibilities reliably."),
+                    ("vpc_openness", "Openness", "The teacher listens to student opinions and considers reasonable suggestions about learning.")
+                  ] %}
+                  {% for name, label, desc in cat3 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 4: Classroom Management -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">4</span>
+                Classroom Rules and Management
+              </div>
+              <div class="eval-category-desc">How the teacher establishes and maintains a productive classroom environment.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat4 = [
+                    ("cm_rules", "Clear rules", "The teacher explains classroom expectations and the reasons behind them."),
+                    ("cm_enforcement", "Consistent enforcement", "The teacher applies stated rules consistently in similar situations."),
+                    ("cm_time", "Time management", "The teacher uses class time purposefully for explanation, practice, and review."),
+                    ("cm_procedures", "Classroom procedures", "The teacher explains routine processes such as submitting work and requesting assistance."),
+                    ("cm_discipline", "Respectful discipline", "The teacher addresses disruptive behavior promptly while treating students with dignity.")
+                  ] %}
+                  {% for name, label, desc in cat4 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 5: Assessment and Feedback -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">5</span>
+                Assessment and Feedback
+              </div>
+              <div class="eval-category-desc">How the teacher evaluates learning and communicates results to students.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat5 = [
+                    ("af_instructions", "Task instructions", "The teacher explains the requirements and expected output of assignments and assessments."),
+                    ("af_alignment", "Lesson alignment", "The teacher assesses the knowledge and skills covered during instruction."),
+                    ("af_criteria", "Grading criteria", "The teacher explains the standards used to evaluate student work before submission."),
+                    ("af_timely", "Timely feedback", "The teacher returns feedback while students can still use it in later tasks."),
+                    ("af_helpful", "Helpful feedback", "The teacher identifies specific strengths and areas for improvement in student work.")
+                  ] %}
+                  {% for name, label, desc in cat5 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 6: Communication and Student Support -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">6</span>
+                Communication and Student Support
+              </div>
+              <div class="eval-category-desc">How the teacher shares important information and responds to academic concerns.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat6 = [
+                    ("cs_announcements", "Clear announcements", "The teacher communicates important dates, requirements, and changes through an agreed channel."),
+                    ("cs_approachability", "Approachability", "The teacher creates a welcoming atmosphere for students who need academic help."),
+                    ("cs_consultation", "Consultation availability", "The teacher provides announced opportunities for consultation."),
+                    ("cs_guidance", "Additional guidance", "The teacher provides further explanation when students struggle with a lesson."),
+                    ("cs_resources", "Learning resources", "The teacher provides relevant materials that students can use for review and practice.")
+                  ] %}
+                  {% for name, label, desc in cat6 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Category 7: Student Engagement and Inclusion -->
+          <div class="eval-form-card">
+            <div class="eval-category">
+              <div class="eval-category-title">
+                <span class="eval-category-num">7</span>
+                Student Engagement and Inclusion
+              </div>
+              <div class="eval-category-desc">Whether students have meaningful opportunities to participate and feel included in learning.</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th style="width:55%">Subcategory</th>
+                    <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set cat7 = [
+                    ("ei_participation", "Active participation", "The teacher gives students opportunities to contribute during lessons rather than only listen."),
+                    ("ei_thinking", "Critical thinking", "The teacher encourages students to explain their reasoning and examine different possible answers."),
+                    ("ei_collaboration", "Collaboration", "The teacher organizes group activities with a clear shared purpose."),
+                    ("ei_inclusion", "Inclusive participation", "The teacher provides different ways for students to contribute."),
+                    ("ei_encouragement", "Encouragement", "The teacher recognizes effort and progress while encouraging students to continue improving.")
+                  ] %}
+                  {% for name, label, desc in cat7 %}
+                  <tr>
+                    <td>
+                      <div class="subcategory-name">{{ label }}</div>
+                      <div class="subcategory-desc">{{ desc }}</div>
+                    </td>
+                    {% for val in [5,4,3,2,1] %}
+                    <td class="radio-cell">
+                      <input type="radio" class="likert-radio" name="{{ name }}" value="{{ val }}" required />
+                    </td>
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Open-ended Written Feedback -->
+          <div class="open-feedback-card">
+            <div style="font-size:15px; font-weight:800; margin-bottom:4px;">Written Feedback</div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Share any additional comments about {{ member.name }}. Your identity will not be stored.</p>
+
             <div class="lang-warning" id="langWarning">
-              <span class="lang-warning-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               <span id="langWarningText">Tagalog detected. Please rewrite your feedback in English.</span>
             </div>
             <div class="noise-warning" id="noiseWarning">
-              <span class="lang-warning-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              </span>
-              <span id="noiseWarningText">Invalid response detected. Please write a meaningful evaluation in English.</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span id="noiseWarningText">Invalid response detected. Please write a meaningful evaluation.</span>
             </div>
 
-            <!-- Feedback textarea -->
-            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Written Feedback</div>
             <textarea
               class="feedback-textarea"
               id="feedbackText"
@@ -223,55 +611,58 @@
               {% if not member.accepting %}disabled{% endif %}
             ></textarea>
             <div class="char-counter"><span id="charCount">0</span>/500</div>
-            <p class="feedback-note" style="margin-top:8px;">Sentiment is analyzed automatically. Your identity will not be stored.</p>
+            <p class="feedback-note" style="margin-top:8px;">Sentiment is analyzed automatically.</p>
 
-            <button class="btn-submit" id="submitBtn"
-              style="margin-top:16px;"
+            <button class="btn-submit" id="submitBtn" style="margin-top:16px;"
               {% if not member.accepting %}disabled{% endif %}>
               {% if member.accepting %}Submit Evaluation{% else %}Evaluation Closed{% endif %}
             </button>
           </div>
-        </div>
 
-      </div>
+        </div><!-- end evalForm -->
+      </div><!-- end eval-wrap -->
     </div>
   </div>
 </div>
 
 <script>
   const facultyId = {{ member.id }};
-  let selectedRating = 0;
   let noiseCheckTimeout = null;
 
-  const RATING_LABELS = {
-    1: "1 — Poor",
-    2: "2 — Below Average",
-    3: "3 — Average",
-    4: "4 — Good",
-    5: "5 — Excellent"
-  };
+  // All Likert field names for validation
+  const LIKERT_FIELDS = [
+    'tm_clarity','tm_organization','tm_examples','tm_activities','tm_pacing',
+    'sk_accuracy','sk_depth','sk_preparation','sk_objectives','sk_questions',
+    'vpc_respect','vpc_fair','vpc_patience','vpc_responsibility','vpc_openness',
+    'cm_rules','cm_enforcement','cm_time','cm_procedures','cm_discipline',
+    'af_instructions','af_alignment','af_criteria','af_timely','af_helpful',
+    'cs_announcements','cs_approachability','cs_consultation','cs_guidance','cs_resources',
+    'ei_participation','ei_thinking','ei_collaboration','ei_inclusion','ei_encouragement'
+  ];
 
-  // Star rating
-  document.querySelectorAll('.star').forEach(star => {
-    star.addEventListener('click', () => {
-      selectedRating = parseInt(star.dataset.val);
-      document.querySelectorAll('.star').forEach((s, i) => {
-        s.classList.toggle('active', i < selectedRating);
-      });
-      document.getElementById('ratingLabel').textContent = RATING_LABELS[selectedRating];
+  function getLikertAverage() {
+    let total = 0, count = 0;
+    LIKERT_FIELDS.forEach(field => {
+      const checked = document.querySelector(`input[name="${field}"]:checked`);
+      if (checked) { total += parseInt(checked.value); count++; }
     });
-  });
+    return count > 0 ? total / count : 0;
+  }
 
-  // Char counter + live noise check
+  function getLikertValues() {
+    const values = {};
+    LIKERT_FIELDS.forEach(field => {
+      const checked = document.querySelector(`input[name="${field}"]:checked`);
+      values[field] = checked ? parseInt(checked.value) : null;
+    });
+    return values;
+  }
+
   function onTextInput() {
     const text = document.getElementById('feedbackText').value;
     document.getElementById('charCount').textContent = text.length;
-
-    // Hide warnings while typing
     document.getElementById('langWarning').classList.remove('show');
     document.getElementById('noiseWarning').classList.remove('show');
-
-    // Debounced live check
     clearTimeout(noiseCheckTimeout);
     if (text.trim().length > 8) {
       noiseCheckTimeout = setTimeout(() => liveNoiseCheck(text), 800);
@@ -288,44 +679,49 @@
       const data = await res.json();
       if (data.is_noise) {
         if (data.type === 'tagalog') {
-          document.getElementById('langWarningText').textContent =
-            'Tagalog detected in your response. Please rewrite in English only.';
+          document.getElementById('langWarningText').textContent = 'Tagalog detected. Please rewrite in English.';
           document.getElementById('langWarning').classList.add('show');
         } else {
-          document.getElementById('noiseWarningText').textContent =
-            'This response may be flagged as invalid. Please write a meaningful evaluation.';
+          document.getElementById('noiseWarningText').textContent = 'This response may be flagged as invalid.';
           document.getElementById('noiseWarning').classList.add('show');
         }
       }
     } catch(e) {}
   }
 
-  // Submit
   document.getElementById('submitBtn').addEventListener('click', async function() {
-    const text = document.getElementById('feedbackText').value.trim();
-
-    if (selectedRating === 0) {
-      alert('Please select a star rating first.');
+    // Validate all Likert fields answered
+    const unanswered = LIKERT_FIELDS.filter(f => !document.querySelector(`input[name="${f}"]:checked`));
+    if (unanswered.length > 0) {
+      alert(`Please answer all questions. ${unanswered.length} item(s) still unanswered.`);
+      // Scroll to first unanswered
+      const first = document.querySelector(`input[name="${unanswered[0]}"]`);
+      if (first) first.closest('tr').scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+
+    const text = document.getElementById('feedbackText').value.trim();
     if (!text) {
-      alert('Please write your feedback before submitting.');
+      alert('Please write your feedback in the Written Feedback section.');
       return;
     }
 
     this.disabled = true;
     this.textContent = 'Submitting…';
 
+    const avg = getLikertAverage();
+    // Convert average to 5-star rating
+    const rating = Math.round(avg);
+
     try {
       const res = await fetch(`/student/submit/${facultyId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, rating: selectedRating })
+        body: JSON.stringify({ text, rating, likert: getLikertValues() })
       });
       const data = await res.json();
 
       if (data.status === 'noise') {
-        // Show appropriate warning but don't block
         if (data.type === 'tagalog') {
           document.getElementById('langWarningText').textContent = data.message;
           document.getElementById('langWarning').classList.add('show');
@@ -335,13 +731,11 @@
         }
         this.disabled = false;
         this.textContent = 'Submit Evaluation';
-
       } else if (data.status === 'success') {
-        // Show thank you screen
         document.getElementById('evalForm').style.display = 'none';
         document.getElementById('thankyouScreen').classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-
     } catch(e) {
       alert('Something went wrong. Please try again.');
       this.disabled = false;

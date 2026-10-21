@@ -31,11 +31,20 @@ def save_data(data):
 # ---------------------------------------------------------------------------
 # FIXED CREDENTIALS — replace with DB lookup after Jamie's backend merges
 # ---------------------------------------------------------------------------
+# Section assignments: each section has specific faculty IDs
+SECTIONS = {
+    "BSCPE-4A": {"faculty_ids": [1, 2, 3, 4], "label": "BSCPE-4A"},
+    "BSCPE-4B": {"faculty_ids": [3, 4, 5, 6], "label": "BSCPE-4B"},
+    "BSCPE-4C": {"faculty_ids": [5, 6, 7, 8], "label": "BSCPE-4C"},
+}
+
 USERS = {
-    # Students
-    "student":    {"password": "student123",  "role": "student"},
+    # Students — each assigned to a section
+    "student":    {"password": "student123",  "role": "student",  "section": "BSCPE-4A"},
+    "student_4b": {"password": "student123",  "role": "student",  "section": "BSCPE-4B"},
+    "student_4c": {"password": "student123",  "role": "student",  "section": "BSCPE-4C"},
     # Program Chair
-    "programchair": {"password": "chair123",  "role": "programchair"},
+    "programchair": {"password": "chair123",  "role": "programchair", "section": None},
 }
 
 # ---------------------------------------------------------------------------
@@ -400,6 +409,7 @@ def login():
             session["logged_in"] = True
             session["username"] = username
             session["role"] = user["role"]
+            session["section"] = user.get("section")
             if user["role"] == "student":
                 return redirect(url_for("student_dashboard"))
             else:
@@ -420,7 +430,13 @@ def logout():
 @app.route("/student/dashboard")
 @login_required(role="student")
 def student_dashboard():
-    return render_template("student_dashboard.html", faculty=FACULTY)
+    section_key = session.get("section", "BSCPE-4A")
+    section = SECTIONS.get(section_key, SECTIONS["BSCPE-4A"])
+    faculty_ids = section["faculty_ids"]
+    section_faculty = [f for f in FACULTY if f["id"] in faculty_ids]
+    return render_template("student_dashboard.html",
+                           faculty=section_faculty,
+                           section=section_key)
 
 
 @app.route("/student/evaluate/<int:faculty_id>", methods=["GET"])
@@ -442,6 +458,7 @@ def submit_evaluation(faculty_id):
     data = request.json
     text = data.get("text", "").strip()
     rating = data.get("rating", 0)
+    likert = data.get("likert", {})
 
     if not text:
         return jsonify({"status": "error", "message": "Please enter your feedback."}), 400
@@ -477,16 +494,17 @@ def submit_evaluation(faculty_id):
     label = simple_sentiment(text)
     member = next((f for f in FACULTY if f["id"] == faculty_id), None)
     if member:
-        data = load_data()
-        data["valid_submissions"].append({
+        data_store = load_data()
+        data_store["valid_submissions"].append({
             "faculty":  member["name"],
             "initials": member["initials"],
             "color":    member["color"],
             "text":     text,
             "rating":   rating,
             "label":    label,
+            "likert":   likert,
         })
-        save_data(data)
+        save_data(data_store)
     return jsonify({
         "status": "success",
         "label": label,
